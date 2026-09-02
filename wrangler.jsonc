@@ -1,5 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "shifen-waterfall-guide",
-  "compatibility_date": "2026-09-01"
+  // 适配器 v13+ / Astro 6+：Worker 入口為套件內路徑，
+  // 不可再指向 dist/_worker.js/index.js（該檔案建置前不存在，astro sync 會硬失敗）
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  }
 }
