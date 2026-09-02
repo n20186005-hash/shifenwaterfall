@@ -1,7 +1,7 @@
 // 十分瀑布旅遊指南 Service Worker
 // 策略：靜態資源 cache-first；導航 network-first（失敗時回退快取，支援離線瀏覽）。
 // 外站請求（Google Maps iframe、Open-Meteo、GA）不攔截。
-const CACHE = 'shifen-v1';
+const CACHE = 'shifen-v2';
 const PRECACHE = ['/', '/icons/favicon.svg', '/icons/logo.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -28,6 +28,8 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  // Astro server islands（server:defer 的天氣區）：交由網路直接處理，不進快取，避免拿到過期資料。
+  if (url.pathname.startsWith('/_server-islands/')) return;
 
   // 靜態資源：快取優先，未命中時抓取並寫入快取。
   if (request.destination === 'image' || request.destination === 'font' || request.destination === 'style' || request.destination === 'script') {
@@ -37,7 +39,10 @@ self.addEventListener('fetch', (event) => {
         return fetch(request).then((res) => {
           if (res.ok) {
             const copy = res.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
+            caches
+              .open(CACHE)
+              .then((cache) => cache.put(request, copy))
+              .catch(() => {});
           }
           return res;
         });
@@ -52,7 +57,10 @@ self.addEventListener('fetch', (event) => {
       .then((res) => {
         if (res.ok) {
           const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          caches
+            .open(CACHE)
+            .then((cache) => cache.put(request, copy))
+            .catch(() => {});
         }
         return res;
       })

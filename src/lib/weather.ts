@@ -10,6 +10,8 @@ export const FORECAST_DAYS = 7;
 
 /** 快取 TTL：30 分鐘。Open-Meteo 免費層建議避免過度頻繁請求。 */
 const CACHE_TTL_SECONDS = 1800;
+/** 外部請求硬性逾時（毫秒）。 */
+const WEATHER_TIMEOUT_MS = 8000;
 const API_ENDPOINT = 'https://api.open-meteo.com/v1/forecast';
 
 export interface WeatherNow {
@@ -138,11 +140,24 @@ export async function getWeather(caches?: CacheLike): Promise<WeatherData | null
 
   try {
     // 2. 請求 Open-Meteo
-    const res = await fetch(url, {
-      headers: { accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) return null;
+    // 雙重逾時保險：AbortSignal 在部分 serverless runtime 未必生效，
+    // 再以 Promise.race 施加硬性上限，確保 SSR 不會因外部請求掛起而無法產生回應。
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let res: Response | undefined;
+    try {
+      res = await Promise.race<Response>([
+        fetch(url, {
+          headers: { accept: 'application/json' },
+          signal: AbortSignal.timeout(WEATHER_TIMEOUT_MS),
+        }),
+        new Promise<Response>((_, reject) => {
+          timer = setTimeout(() => reject(new Error('weather request timeout')), WEATHER_TIMEOUT_MS);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+    if (!res || !res.ok) return null;
     const payload = (await res.json()) as OpenMeteoResponse;
 
     // 3. 回寫 Cache API（body 已被讀取，需以新 Response 寫入；寫入失敗不影響回傳）

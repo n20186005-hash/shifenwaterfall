@@ -252,7 +252,18 @@ const breadcrumbSchema = {
     </div>
   </section>
 
-  <WeatherSection />
+  <!-- 天氣區以 server island 延遲渲染（server:defer）：
+       首頁 SSR 因此保持同步、立即輸出；天氣由瀏覽器另向 /_server-islands/ 取得，
+       避免 SSR 在 await 外部 API 時中斷而回傳空回應。 -->
+  <WeatherSection server:defer>
+    <div slot="fallback" class="section bg-[#0d2b26] text-white">
+      <div class="container">
+        <p class="section-kicker !text-[#8ed1bf]">天氣預報</p>
+        <h2 class="section-title">出發前看一眼：十分瀑布即時天氣與未來預報</h2>
+        <p class="mt-8 text-white/62">天氣資料載入中；若暫時無法取得，請以交通部中央氣象署最新預報為準。</p>
+      </div>
+    </div>
+  </WeatherSection>
 
   <FacilitiesSection />
 
