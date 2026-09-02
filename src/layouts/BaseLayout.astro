@@ -1,0 +1,145 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  robots?: string;
+}
+
+const {
+  title,
+  description,
+  image = '/images/shifen-waterfall-hero.jpg',
+  robots = 'index,follow,max-image-preview:large',
+} = Astro.props;
+
+const absoluteUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const absoluteImage = Astro.site ? new URL(image, Astro.site).href : undefined;
+const isHome = Astro.url.pathname === '/';
+---
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0d2b26" />
+    <meta name="robots" content={robots} />
+    <meta name="description" content={description} />
+    <meta name="geo.region" content="TW-NWT" />
+    <meta name="geo.placename" content="新北市平溪區十分瀑布" />
+    <meta name="ICBM" content="25.0482681, 121.7846723" />
+    <title>{title}</title>
+    {absoluteUrl && <link rel="canonical" href={absoluteUrl} />}
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/icons/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:site_name" content="十分瀑布旅遊指南" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {absoluteUrl && <meta property="og:url" content={absoluteUrl} />}
+    {absoluteImage && <meta property="og:image" content={absoluteImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {absoluteImage && <meta name="twitter:image" content={absoluteImage} />}
+
+    <slot name="head" />
+
+    <!-- GA4 僅在使用者於 Cookie 設定頁明確啟用分析型 Cookie 後載入。 -->
+    <script is:inline>
+      (() => {
+        const GA_ID = 'G-HXM22WWPKP';
+        const KEY = 'shifen-cookie-preferences-v1';
+        try {
+          const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+          if (saved.analytics !== true) return;
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function(){ window.dataLayer.push(arguments); };
+          window.gtag('js', new Date());
+          window.gtag('config', GA_ID, { anonymize_ip: true });
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+          script.dataset.service = 'google-analytics';
+          document.head.appendChild(script);
+        } catch (_) {
+          // 未取得同意或偏好資料不可用時，不載入分析服務。
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg">跳到主要內容</a>
+
+    <header class="sticky top-0 z-50 border-b border-white/40 bg-[#f7fbf9]/90 backdrop-blur-xl">
+      <div class="container flex min-h-18 items-center justify-between gap-6 py-3">
+        <a href="/" class="shrink-0" aria-label="十分瀑布旅遊指南首頁">
+          <img src="/icons/logo.svg" alt="十分瀑布旅遊指南" width="184" height="52" class="h-12 w-auto" />
+        </a>
+        <nav aria-label="主要導覽" class="hidden items-center gap-5 text-sm font-semibold text-[#355b51] lg:flex">
+          <a href="/#about" class="hover:text-[#0d2b26]">瀑布特色</a>
+          <a href="/#visit" class="hover:text-[#0d2b26]">開放與費用</a>
+          <a href="/#transport" class="hover:text-[#0d2b26]">交通停車</a>
+          <a href="/#nearby" class="hover:text-[#0d2b26]">周邊探索</a>
+          <a href="/#faq" class="hover:text-[#0d2b26]">常見問答</a>
+          <a href="/#map" class="btn btn-primary !px-4 !py-2">地圖導航</a>
+        </nav>
+        <a href={isHome ? '#map' : '/#map'} class="btn btn-primary !px-4 !py-2 text-sm lg:hidden">地圖</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="border-t border-[#d8e8e2] bg-[#071d1a] text-white">
+      <div class="container py-12">
+        <div class="grid gap-10 lg:grid-cols-[1.15fr_.85fr]">
+          <div>
+            <img src="/icons/logo.svg" alt="十分瀑布旅遊指南" width="184" height="52" class="mb-5 h-12 w-auto rounded-xl bg-white px-2" />
+            <p class="max-w-2xl text-sm leading-7 text-white/72">本網站為一個獨立的非營利遊客資訊指南項目，與任何政府機構或官方組織均無隸屬關係。</p>
+            <p class="mt-3 max-w-2xl text-sm leading-7 text-white/72">本站景點資訊均參考並對照考證自新北市政府、新北市政府觀光旅遊局與交通部觀光署公開資料，不包含任何商業性推薦。</p>
+            <p class="mt-3 max-w-2xl text-sm leading-7 text-white/72">圖片產權：本網站所展示的所有圖片產權及版權均歸原攝影者所有；使用時依各圖片原始授權條款標示。</p>
+          </div>
+          <div class="grid grid-cols-2 gap-6 text-sm sm:grid-cols-3 lg:justify-self-end">
+            <div>
+              <p class="mb-3 font-bold text-white">旅遊資訊</p>
+              <div class="flex flex-col gap-2 text-white/68">
+                <a href="/#visit" class="hover:text-white">開放與費用</a>
+                <a href="/#transport" class="hover:text-white">交通方式</a>
+                <a href="/#nearby" class="hover:text-white">周邊景點</a>
+              </div>
+            </div>
+            <div>
+              <p class="mb-3 font-bold text-white">政策</p>
+              <div class="flex flex-col gap-2 text-white/68">
+                <a href="/privacy/" class="hover:text-white">隱私政策</a>
+                <a href="/terms/" class="hover:text-white">服務條款</a>
+                <a href="/cookie-settings/" class="hover:text-white">Cookie 設定</a>
+              </div>
+            </div>
+            <div>
+              <p class="mb-3 font-bold text-white">權威資料</p>
+              <div class="flex flex-col gap-2 text-white/68">
+                <a href="https://newtaipei.travel/zh-tw/Attractions/Detail/109612" rel="external noopener" target="_blank" class="hover:text-white">新北旅客</a>
+                <a href="https://www.taiwan.net.tw/m1.aspx?id=2188&sNo=0001091" rel="external noopener" target="_blank" class="hover:text-white">交通部觀光署</a>
+                <a href="https://maps.app.goo.gl/tf7NwV2xuaYJ4ZiQ8" rel="external noopener" target="_blank" class="hover:text-white">Google 地圖</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
+          <p>© 2026 十分瀑布旅遊指南。保留所有權利。</p>
+          <p>非官方旅遊資訊指南 · 重要行程資訊請於出發前向官方來源再次確認。</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

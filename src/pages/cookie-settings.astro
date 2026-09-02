@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const title = 'Cookie 設定｜十分瀑布旅遊指南';
+const description = '管理十分瀑布旅遊指南的必要、分析、偏好與行銷 Cookie 選項。Google Analytics 預設不載入，只有同意後啟用。';
+---
+<BaseLayout title={title} description={description} image="/images/shifen-waterfall-angle.jpg">
+  <section class="section mist-bg min-h-[70vh]">
+    <div class="container max-w-4xl">
+      <article class="prose-policy rounded-[2rem] border border-[#d9e9e3] bg-white p-7 shadow-[0_24px_70px_rgba(13,43,38,.08)] sm:p-12">
+        <p class="section-kicker">Cookie 偏好管理</p>
+        <h1>Cookie 設定</h1>
+        <p class="text-sm">最後更新時間：2026年9月</p>
+        <p class="mt-6">我們使用 Cookie 或類似技術來維持網站功能、記住您的偏好，並在您明確同意後分析匿名化的整體使用情況。您可以在本頁直接管理設定；本頁是獨立二級頁面，不以彈窗呈現。</p>
+
+        <div id="cookie-panel" class="mt-10 space-y-4">
+          <section class="rounded-3xl border border-[#d9e9e3] p-6">
+            <div class="flex items-start justify-between gap-6">
+              <div><h2 class="!m-0 !text-xl">必要 Cookie</h2><p class="mt-2 text-sm">用於網站基本運作與保存您的同意選擇。這類功能對網站正常運作至關重要，無法停用。</p></div>
+              <span class="shrink-0 rounded-full bg-[#e4f3ee] px-3 py-1 text-xs font-bold text-[#216553]">始終啟用</span>
+            </div>
+          </section>
+
+          <section class="rounded-3xl border border-[#d9e9e3] p-6">
+            <div class="flex items-start justify-between gap-6">
+              <div><h2 class="!m-0 !text-xl">分析型 Cookie</h2><p class="mt-2 text-sm">啟用後才載入 Google Analytics 4（G-HXM22WWPKP），協助了解頁面瀏覽與整體使用模式。預設關閉。</p></div>
+              <label class="relative mt-1 inline-flex cursor-pointer items-center">
+                <input id="analytics-toggle" type="checkbox" class="peer sr-only" />
+                <span class="h-7 w-12 rounded-full bg-[#cad8d3] transition after:absolute after:left-1 after:top-1 after:size-5 after:rounded-full after:bg-white after:transition peer-checked:bg-[#2b7a68] peer-checked:after:translate-x-5"></span>
+                <span class="sr-only">切換 Google Analytics</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="rounded-3xl border border-[#d9e9e3] p-6">
+            <div class="flex items-start justify-between gap-6">
+              <div><h2 class="!m-0 !text-xl">偏好 Cookie</h2><p class="mt-2 text-sm">允許網站保存非必要的顯示與使用偏好。本站目前功能較簡單，不啟用也不影響閱讀旅遊資訊。</p></div>
+              <label class="relative mt-1 inline-flex cursor-pointer items-center">
+                <input id="preferences-toggle" type="checkbox" class="peer sr-only" />
+                <span class="h-7 w-12 rounded-full bg-[#cad8d3] transition after:absolute after:left-1 after:top-1 after:size-5 after:rounded-full after:bg-white after:transition peer-checked:bg-[#2b7a68] peer-checked:after:translate-x-5"></span>
+                <span class="sr-only">切換偏好功能</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="rounded-3xl border border-[#d9e9e3] bg-[#f7f9f8] p-6">
+            <div class="flex items-start justify-between gap-6">
+              <div><h2 class="!m-0 !text-xl">行銷 Cookie</h2><p class="mt-2 text-sm">本站目前不載入廣告平台、個人化廣告或行銷追蹤，因此沒有可啟用的行銷 Cookie。</p></div>
+              <span class="shrink-0 rounded-full bg-[#eef1f0] px-3 py-1 text-xs font-bold text-[#6f7e79]">停用</span>
+            </div>
+          </section>
+        </div>
+
+        <h2>Google 地圖</h2>
+        <p>首頁內嵌 Google Maps 以提供位置與導航。地圖屬於第三方內容，載入時可能依 Google 的政策使用 Cookie 或其他技術。Google Maps 與 GA4 是不同服務；停用分析 Cookie 並不代表 Google 地圖本身不會處理技術資料。</p>
+
+        <h2>同意管理</h2>
+        <p>您可以隨時回到本頁更改選擇。停用非必要功能不會影響閱讀景點資訊；重新載入頁面後，新設定會完整生效。</p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <button id="save-preferences" type="button" class="btn btn-primary">儲存偏好設定</button>
+          <button id="reject-all" type="button" class="btn btn-secondary">拒絕一切非必要項目</button>
+        </div>
+        <p id="cookie-status" class="mt-4 min-h-7 text-sm font-semibold text-[#2b7a68]" role="status" aria-live="polite"></p>
+      </article>
+    </div>
+  </section>
+
+  <script>
+    const KEY = 'shifen-cookie-preferences-v1';
+    const analytics = document.querySelector<HTMLInputElement>('#analytics-toggle');
+    const preferences = document.querySelector<HTMLInputElement>('#preferences-toggle');
+    const save = document.querySelector<HTMLButtonElement>('#save-preferences');
+    const reject = document.querySelector<HTMLButtonElement>('#reject-all');
+    const status = document.querySelector<HTMLElement>('#cookie-status');
+
+    type CookiePreferences = {
+      analytics: boolean;
+      preferences: boolean;
+      marketing: false;
+      savedAtMonth: string;
+    };
+
+    function readPreferences(): Partial<CookiePreferences> {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') as Partial<CookiePreferences>; }
+      catch { return {}; }
+    }
+
+    function setStatus(message: string) {
+      if (status) status.textContent = message;
+    }
+
+    const current = readPreferences();
+    if (analytics) analytics.checked = current.analytics === true;
+    if (preferences) preferences.checked = current.preferences === true;
+
+    save?.addEventListener('click', () => {
+      const value: CookiePreferences = {
+        analytics: analytics?.checked === true,
+        preferences: preferences?.checked === true,
+        marketing: false,
+        savedAtMonth: '2026-09',
+      };
+      localStorage.setItem(KEY, JSON.stringify(value));
+      setStatus('已儲存偏好設定。重新載入頁面後會完整套用。');
+    });
+
+    reject?.addEventListener('click', () => {
+      if (analytics) analytics.checked = false;
+      if (preferences) preferences.checked = false;
+      const value: CookiePreferences = {
+        analytics: false,
+        preferences: false,
+        marketing: false,
+        savedAtMonth: '2026-09',
+      };
+      localStorage.setItem(KEY, JSON.stringify(value));
+      setStatus('已拒絕所有非必要項目；必要功能仍保持啟用。');
+    });
+  </script>
+</BaseLayout>

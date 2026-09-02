@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const title = '服務條款｜十分瀑布旅遊指南';
+const description = '十分瀑布旅遊指南服務條款，說明網站性質、資訊準確性、內容與圖片授權、第三方服務及責任限制。';
+---
+<BaseLayout title={title} description={description} image="/images/shifen-waterfall-rainbow.jpg">
+  <section class="section mist-bg min-h-[70vh]">
+    <article class="container prose-policy max-w-4xl rounded-[2rem] border border-[#d9e9e3] bg-white p-7 shadow-[0_24px_70px_rgba(13,43,38,.08)] sm:p-12">
+      <p class="section-kicker">使用規範</p>
+      <h1>服務條款</h1>
+      <p class="text-sm">最後更新時間：2026年9月</p>
+      <p class="mt-6">存取或使用「十分瀑布旅遊指南」，即表示您同意受本服務條款約束。若您不同意其中任何內容，請停止使用本站。</p>
+
+      <h2>網站性質</h2>
+      <p>本網站是一個獨立的非營利遊客資訊指南項目，目的在於整理十分瀑布、平溪區交通與周邊旅遊資訊。我們不是十分瀑布、新北市政府、任何政府機構、官方旅遊組織、交通業者或商業營運者的官方網站，也不代表其發言。</p>
+
+      <h2>內容使用</h2>
+      <p>本站原創文字、資訊架構、介面設計、圖示與程式碼受適用的著作權及相關法律保護。除第三方另有授權標示的素材外，未經允許不得將本站原創內容大規模複製、轉售、冒充官方內容或以足以造成混淆的方式重新發布。</p>
+
+      <h2>資訊的準確性與時效</h2>
+      <p>我們會優先對照新北市政府、新北市政府觀光旅遊局、交通部觀光署及 Google Maps 等來源，但無法保證所有資訊在任何時間都完整、即時或無誤。開放時間、步道狀況、交通班次、停車、費用、天候與臨時管制都可能變更。</p>
+      <p><strong>重要行程安排請在出發前透過官方渠道再次確認。</strong>本網站不以虛構的精確日期、車位數、票價或其他容易過期的數值取代官方即時公告。</p>
+
+      <h2>圖片與授權</h2>
+      <p>本站使用的實景照片檔案已放入網站專案本地，不依賴外部圖片熱連。圖片著作權仍屬原攝影者；使用權依各作品原始授權條款而定。目前專案使用的主要照片來源包括：</p>
+      <ul>
+        <li>Zairon：十分瀑布實景，Creative Commons BY-SA 4.0；</li>
+        <li>miyaiijima：十分瀑布與彩虹，Creative Commons BY 2.0；</li>
+        <li>Andrewhaimerl：十分瀑布實景，Creative Commons BY 4.0；</li>
+        <li>Cassiopeia sweet：平溪線鐵道實景，作者釋出為公有領域（Public Domain）。</li>
+      </ul>
+      <p>專案中的 <code>IMAGE-LICENSES.md</code> 會保留來源頁與授權資訊。對照片做裁切、縮圖或壓縮不代表攝影者、Wikimedia Commons 或原平台為本站背書。</p>
+
+      <h2>Google 地圖與其他第三方服務</h2>
+      <p>Google 地圖、Google Analytics 與外部官方連結均由第三方提供，其資料與服務受各自條款和隱私政策約束。Google Analytics 僅在使用者透過 <a href="/cookie-settings/">Cookie 設定</a> 主動啟用分析功能後載入。</p>
+
+      <h2>外部連結</h2>
+      <p>本站可能連結至政府機關、旅遊資訊平台、地圖或授權來源。外部網站的內容、可用性、安全性與後續變更不由本站控制。提供連結是為了查證與便利，不構成商業推薦、背書或隸屬關係。</p>
+
+      <h2>旅遊安全</h2>
+      <p>瀑布與山區環境具有濕滑、落差、溪水、豪雨、落石與天候快速變化等風險。請遵守現場告示、封閉線、鐵道安全規範及管理人員指示，不進入禁止區域，也不要僅為拍照而跨越護欄或靠近危險水域。</p>
+
+      <h2>責任限制</h2>
+      <p>在法律允許的最大範圍內，本網站按「現狀」提供，不作明示或默示保證。對因依賴本站資訊、第三方服務中斷、行程變更或現場條件而造成的直接或間接損失，我們不承擔超出適用法律所要求的責任。</p>
+
+      <h2>條款變更</h2>
+      <p>我們可能因功能、法規或資料來源調整而更新本條款。持續使用網站代表您同意以當時有效版本為準。</p>
+
+      <div class="mt-10 rounded-2xl bg-[#edf7f3] p-5 text-sm"><strong>非官方聲明：</strong>本網站僅供旅遊資訊參考，與任何政府機構或官方組織均無隸屬關係。</div>
+    </article>
+  </section>
+</BaseLayout>
