@@ -3,3 +3,5 @@ dist/
 .astro/
 .wrangler/
 .DS_Store
+# 壓縮前的原始照片（27.7 MB，僅供重新產生高畫質輸出用，不部署）
+.image-originals/

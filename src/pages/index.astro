@@ -81,6 +81,7 @@ const faqs = [
   { q: '十分瀑布需要門票嗎？', a: '依新北市官方景點資訊，十分瀑布公園免費入園。若周邊停車或其他個別服務產生費用，則依現場公告為準。' },
   { q: '十分瀑布開放到幾點？', a: '官方景點頁採季節性時段：夏季列示 09:00–18:00，非夏季列示 09:00–17:00，最後入園通常為閉園前 30 分鐘。部分年度會另有春夏延長公告，出發前請查看新北旅客最新通知。' },
   { q: '從十分車站走到十分瀑布要多久？', a: '由十分車站與老街一帶步行前往，通常可抓約 20 分鐘以上；若從十分遊客中心進入友善步道，官方資料指出步道約 400 公尺、步行約 15 分鐘可到園區入口。實際時間依人流與步速而異。' },
+  { q: '從桃園機場或松山機場怎麼去十分瀑布？', a: '桃園國際機場（TPE）可搭機場捷運至臺北車站，轉臺鐵往瑞芳／八堵方向，再於瑞芳站轉乘平溪線至十分站，全程約 2–2.5 小時；也可搭計程車或事先預約包車直達，車程約 70–90 分鐘。臺北松山機場（TSA）可搭捷運文湖線至終點木柵站，轉乘台灣好行木柵—平溪線（795）直達十分遊客中心（十分瀑布），全程約 1.5–2 小時。各班車時刻與銜接安排會調整，出發前請查官方即時資訊。' },
   { q: '輪椅或嬰兒車可以前往嗎？', a: '可以優先使用十分友善步道。新北市已建置平緩坡道並持續串接無障礙通行動線；山區環境仍可能受天候、施工或現場管制影響，建議出發前向十分遊客中心確認。' },
   { q: '開車去十分瀑布方便停車嗎？', a: '官方景點資訊列有停車場設施，十分遊客中心周邊亦有導引。假日山區道路與停車需求較大，建議提早抵達或改搭臺鐵平溪線、公車等大眾運輸。' },
   { q: '十分瀑布和十分老街適合排在同一天嗎？', a: '很適合。兩者距離近，可把十分車站、十分老街、靜安吊橋與十分瀑布串成半日行程；若再延伸到平溪、望古或菁桐，可安排較完整的平溪線一日遊。' },
@@ -116,7 +117,10 @@ const breadcrumbSchema = {
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
 
   <section class="relative min-h-[78svh] overflow-hidden bg-[#071d1a] text-white">
-    <img src="/images/shifen-waterfall-hero.jpg" alt="十分瀑布寬闊水幕與平溪山林" width="1800" height="1200" class="absolute inset-0 h-full w-full object-cover opacity-72" />
+    <picture class="absolute inset-0 block">
+      <source srcset="/images/shifen-waterfall-hero.webp" type="image/webp" />
+      <img src="/images/shifen-waterfall-hero.jpg" alt="十分瀑布寬闊水幕與平溪山林" width="2000" height="1500" class="h-full w-full object-cover opacity-72" />
+    </picture>
     <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,29,26,.94)_0%,rgba(7,29,26,.64)_44%,rgba(7,29,26,.18)_72%,rgba(7,29,26,.48)_100%)]"></div>
     <div class="absolute inset-0 opacity-30" style="background:repeating-linear-gradient(90deg,transparent 0 34px,rgba(255,255,255,.09) 35px 36px);"></div>
     <div class="container relative z-10 flex min-h-[78svh] items-end py-16 sm:py-20 lg:items-center">
@@ -173,8 +177,11 @@ const breadcrumbSchema = {
           </div>
         </div>
         <figure class="relative">
-          <img src="/images/shifen-waterfall-rainbow.jpg" alt="十分瀑布水霧上方出現彩虹" width="1600" height="1067" loading="lazy" class="aspect-[4/3] w-full rounded-[2rem] object-cover shadow-[0_30px_80px_rgba(7,29,26,.18)]" />
-          <figcaption class="mt-3 text-xs text-[#71867f]">十分瀑布與彩虹。照片：miyaiijima，CC BY 2.0。</figcaption>
+          <picture class="block w-full">
+            <source srcset="/images/shifen-waterfall-viewpoint.webp" type="image/webp" />
+            <img src="/images/shifen-waterfall-viewpoint.jpg" alt="從觀景台望向十分瀑布水幕與山林" width="1600" height="1125" loading="lazy" class="aspect-[4/3] w-full rounded-[2rem] object-cover shadow-[0_30px_80px_rgba(7,29,26,.18)]" />
+          </picture>
+          <figcaption class="mt-3 text-xs text-[#71867f]">從觀景台望向十分瀑布。照片授權：Wikimedia Commons 公開授權作品，詳細作者與授權條款見 <a href="/#sources" class="underline">本頁「權威資料來源」</a> 與 IMAGE-LICENSES.md。</figcaption>
           <div class="absolute -bottom-5 -left-5 hidden rounded-3xl bg-[#0d2b26] p-5 text-white shadow-xl sm:block">
             <p class="text-xs tracking-widest text-white/58">觀景提示</p><p class="mt-1 font-serif text-xl">彩虹取決於陽光、水霧與觀看角度，不保證每次都能遇見。</p>
           </div>
@@ -224,9 +231,9 @@ const breadcrumbSchema = {
         <p class="max-w-xl text-sm leading-7 text-[#61756f]">網站使用的實景照片均放在專案 <code class="rounded bg-[#edf5f2] px-1.5 py-1">public/images</code> 內，不從外站熱連；來源與授權保留於圖說及專案授權檔。</p>
       </div>
       <div class="grid gap-5 md:grid-cols-12">
-        <figure class="md:col-span-7"><img src="/images/shifen-waterfall-angle.jpg" alt="不同角度望向十分瀑布與瀑潭" width="1500" height="1125" loading="lazy" class="aspect-[4/3] w-full rounded-3xl object-cover" /><figcaption class="mt-2 text-xs text-[#71867f]">照片：Zairon · CC BY-SA 4.0</figcaption></figure>
-        <figure class="md:col-span-5"><img src="/images/shifen-waterfall-portrait.jpg" alt="近距離觀看十分瀑布水流" width="1000" height="1250" loading="lazy" class="aspect-[4/5] w-full rounded-3xl object-cover" /><figcaption class="mt-2 text-xs text-[#71867f]">照片：Andrewhaimerl · CC BY 4.0</figcaption></figure>
-        <figure class="md:col-span-12"><img src="/images/shifen-old-street-train.jpg" alt="平溪線列車行經十分一帶的山城鐵道景觀" width="1600" height="1067" loading="lazy" class="aspect-[16/7] w-full rounded-3xl object-cover object-center" /><figcaption class="mt-2 text-xs text-[#71867f]">平溪線鐵道實景。照片：Cassiopeia sweet · 公有領域</figcaption></figure>
+        <figure class="md:col-span-7"><picture class="block w-full"><source srcset="/images/shifen-waterfall-pool.webp" type="image/webp" /><img src="/images/shifen-waterfall-pool.jpg" alt="十分瀑布水幕與基隆河綠色瀑潭" width="1600" height="1067" loading="lazy" class="aspect-[4/3] w-full rounded-3xl object-cover" /></picture><figcaption class="mt-2 text-xs text-[#71867f]">瀑布水幕與綠色瀑潭。照片授權：Wikimedia Commons 公開授權作品，詳細作者與授權條款見 <a href="/#sources" class="underline">本頁「權威資料來源」</a> 與 IMAGE-LICENSES.md。</figcaption></figure>
+        <figure class="md:col-span-5"><picture class="block w-full"><source srcset="/images/shifen-waterfall-front.webp" type="image/webp" /><img src="/images/shifen-waterfall-front.jpg" alt="十分瀑布正面近觀" width="1600" height="1200" loading="lazy" class="aspect-[4/3] w-full rounded-3xl object-cover" /></picture><figcaption class="mt-2 text-xs text-[#71867f]">十分瀑布正面近觀。照片授權：Wikimedia Commons 公開授權作品，詳細作者與授權條款見 <a href="/#sources" class="underline">本頁「權威資料來源」</a> 與 IMAGE-LICENSES.md。</figcaption></figure>
+        <figure class="md:col-span-12"><picture class="block w-full"><source srcset="/images/shifen-waterfall-wide.webp" type="image/webp" /><img src="/images/shifen-waterfall-wide.jpg" alt="十分瀑布全景：兩岸森林與基隆河峽谷" width="2000" height="946" loading="lazy" class="aspect-[16/7] w-full rounded-3xl object-cover object-center" /></picture><figcaption class="mt-2 text-xs text-[#71867f]">十分瀑布全景，兩岸森林與基隆河峽谷。照片授權：Wikimedia Commons 公開授權作品，詳細作者與授權條款見 <a href="/#sources" class="underline">本頁「權威資料來源」</a> 與 IMAGE-LICENSES.md。</figcaption></figure>
       </div>
     </div>
   </section>
@@ -234,13 +241,15 @@ const breadcrumbSchema = {
   <section id="transport" class="section mist-bg">
     <div class="container">
       <p class="section-kicker">詳細交通</p>
-      <h2 class="section-title">詳細交通：把「十分車站」與「十分遊客中心」當作兩個入口理解</h2>
-      <p class="section-copy">鐵路旅客多從十分車站與老街方向步行；公車與開車旅客則可把十分遊客中心作為清楚的轉折點，再走友善步道前往瀑布園區。</p>
+      <h2 class="section-title">詳細交通：從機場、市區到十分瀑布的完整抵達方式</h2>
+      <p class="section-copy">鐵路旅客多從十分車站與老街方向步行；公車、自駕與計程車旅客則可把十分遊客中心作為清楚的轉折點，再走友善步道前往瀑布園區。以下依「鐵路、公車、機場、計程車、自駕、步道」六種方式整理，班次與路況請以官方即時資訊為準。</p>
       <div class="mt-10 grid gap-5 lg:grid-cols-2">
         <article class="card p-7"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">鐵</span><h3 class="font-serif text-2xl font-bold">臺鐵平溪線</h3></div><p class="mt-4 text-[#526861]">可先搭臺鐵至<strong>瑞芳站或猴硐站</strong>轉乘平溪線，在<strong>十分站</strong>下車。從十分車站可順遊老街、靜安吊橋，再沿指標往瀑布；步行時間依路線、人流與停留方式而異，建議預留約 20 分鐘以上。</p><p class="mt-4 text-sm text-[#71857f]">交通部觀光署亦將平溪線列為可由瑞芳或猴硐轉乘的鐵道旅遊路線。</p></article>
         <article class="card p-7"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">巴</span><h3 class="font-serif text-2xl font-bold">公車 / 台灣好行</h3></div><p class="mt-4 text-[#526861]">新北市官方區域旅遊資訊列有：臺北捷運文湖線<strong>木柵站</strong>轉乘台灣好行木柵—平溪線（795），沿線經菁桐、平溪、十分老街並可到<strong>十分遊客中心（十分瀑布）</strong>；另可從瑞芳搭 846，或查詢新北市新巴士相關路線。</p><p class="mt-4 text-sm text-[#71857f]">班次、停靠與營運安排會調整，出發前請查官方即時資訊。</p></article>
+        <article class="card p-7" id="airport"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">機</span><h3 class="font-serif text-2xl font-bold">從機場出發</h3></div><p class="mt-4 text-[#526861]"><strong>桃園國際機場（TPE）：</strong>搭乘機場捷運至<strong>臺北車站</strong>，轉搭臺鐵往瑞芳／八堵方向，再於<strong>瑞芳站轉乘平溪線至十分站</strong>，全程約 2–2.5 小時；也可在機場搭乘計程車或事先預約包車直達，車程約 70–90 分鐘（視路況）。</p><p class="mt-4 text-[#526861]"><strong>臺北松山機場（TSA）：</strong>搭捷運文湖線至終點<strong>木柵站</strong>，轉乘台灣好行木柵—平溪線（795）直達<strong>十分遊客中心（十分瀑布）</strong>；或轉往臺北車站搭臺鐵再轉平溪線。全程約 1.5–2 小時。</p><p class="mt-4 text-sm text-[#71857f]">攜帶行李或搭乘國際航班者，建議預留較充裕的轉乘緩衝；各班車時刻與銜接安排會調整，出發前請查機場捷運、臺鐵與台灣好行官方即時資訊。</p></article>
+        <article class="card p-7" id="taxi"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">計</span><h3 class="font-serif text-2xl font-bold">計程車 / 包車</h3></div><p class="mt-4 text-[#526861]">從<strong>瑞芳車站</strong>或<strong>十分車站</strong>一帶搭計程車前往十分遊客中心與瀑布園區，可省去多次轉乘；山區計程車數量有限，假日與熱門時段較不易臨時叫車。</p><p class="mt-4 text-[#526861]">若從<strong>臺北市區</strong>出發，車程約 1 小時；從<strong>桃園國際機場</strong>出發約 70–90 分鐘，實際依路況與出發地而異。多人同行、攜帶行李或想串連平溪線多個車站時，也可事先預約包車或一日行程。</p><p class="mt-4 text-sm text-[#71857f]">費用依各車輛計費表，或以與駕駛／車隊事先確認的金額為準；本站不列出容易變動的費率數字。回程請先約妥車輛或確認末班車時間，避免山區夜間無車可搭。</p></article>
+        <article class="card p-7" id="driving"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">車</span><h3 class="font-serif text-2xl font-bold">開車自駕</h3></div><p class="mt-4 text-[#526861]">導航可使用本頁的 Google 地圖位置，或以<strong>十分遊客中心：新北市平溪區南山里南山坪136號</strong>作為到達點，再依現場指標步行前往。</p><p class="mt-4 text-[#526861]">主要動線多由國道1號或國道3號轉接<strong>台62線</strong>往瑞芳，再沿<strong>106 縣道</strong>進入平溪山區；也可由木柵、深坑方向經 106 縣道前往。實際路線請依即時導航與現場指標。</p><p class="mt-4 text-sm text-[#71857f]">山區道路較窄、會車不易，假日車流增加時，搭乘臺鐵或公車通常更省去找車位的壓力。</p><a href="https://maps.app.goo.gl/tf7NwV2xuaYJ4ZiQ8" target="_blank" rel="noopener external" class="mt-4 inline-block text-sm font-bold text-[#1c6657] underline underline-offset-4">Google 地圖導航 →</a></article>
         <article class="card p-7"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">步</span><h3 class="font-serif text-2xl font-bold">十分友善步道</h3></div><p class="mt-4 text-[#526861]">由十分遊客中心前方進入，官方資料指出友善步道<strong>全長約 400 公尺、步行約 15 分鐘</strong>可抵園區入口，以平緩坡道取代部分階梯。新北市近年亦持續串接無障礙通道，讓輪椅、嬰兒車與高齡旅客更容易通行。</p><p class="mt-4 text-sm text-[#71857f]">山區仍可能因天候、施工或維修臨時調整通行。</p></article>
-        <article class="card p-7"><div class="flex items-center gap-3"><span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-bold text-[#1c6657]">車</span><h3 class="font-serif text-2xl font-bold">開車與計程車</h3></div><p class="mt-4 text-[#526861]">導航可使用使用者提供的 Google 地圖位置，或以<strong>十分遊客中心：新北市平溪區南山里南山坪136號</strong>作為到達點，再按現場指標步行前往。山區道路較窄，假日車流增加時，大眾運輸通常更省去找車位的壓力。</p><a href="https://maps.app.goo.gl/tf7NwV2xuaYJ4ZiQ8" target="_blank" rel="noopener external" class="mt-4 inline-block text-sm font-bold text-[#1c6657] underline underline-offset-4">Google 地圖導航 →</a></article>
       </div>
 
       <div class="mt-8 rounded-[2rem] bg-[#071d1a] p-7 text-white lg:p-9">

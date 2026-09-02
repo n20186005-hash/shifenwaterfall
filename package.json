@@ -15,7 +15,8 @@
     "preview": "astro preview",
     "deploy": "pnpm build && wrangler deploy",
     "audit:source": "node scripts/audit-source.mjs",
-    "audit:language": "node scripts/audit-language.mjs"
+    "audit:language": "node scripts/audit-language.mjs",
+    "images:compress": "python -X utf8 scripts/compress-images.py"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.2.5",

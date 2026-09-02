@@ -45,3 +45,27 @@ CI 閘門修復（2026-09-02，Cloudflare 建置環境實測，多輪）：
 - 根因：首頁是全站唯一在 SSR 期間 top-level await 外部 API 的頁面（`WeatherSection` → Open-Meteo）。在 Cloudflare Workers 上，該 await 使 SSR 回應串流在輸出任何內容前即結束，回傳 200 空 body（回應僅 192ms，與內頁 199ms 相當，非逾時掛起）。
 - 修復：`WeatherSection` 改為 Astro server island（`<WeatherSection server:defer>` ＋ `slot="fallback"` 載入佔位），首頁 SSR 恢復同步、立即輸出，天氣改由瀏覽器向 `/_server-islands/` 端點取得；`weather.ts` 增加 `Promise.race` 硬性逾時（8s）雙重保險；`sw.js` 快取版本升級為 `shifen-v2`（清除可能已快取的空首頁）、放行 `/_server-islands/` 不進快取、並為快取寫入補上 catch。
 - 待驗證：本機無 node_modules 無法執行 `astro check`／`astro build`，需重新觸發部署後確認首頁恢復。
+
+照片不顯示修復（2026-09-02）：
+- 原因：`public/images/` 內的真實照片為 `hero`／`pool`／`viewpoint`／`front`／`wide` 五張（3.1–7.5 MB，皆為有效 JPEG），但程式碼引用的是另一套舊檔名（`rainbow`／`portrait`／`angle`／`old-street-train`），其中 4 個檔案不存在，僅 `hero.jpg` 能顯示。
+- 修復：依照片尺寸與內容重新對位——首屏 hero 維持 `hero.jpg`（3648×2736，4:3）；about 區改 `viewpoint.jpg`（觀景台視角）；gallery 大圖改 `pool.jpg`（瀑布＋綠色瀑潭，3:2）；gallery 窄欄原 `aspect-[4/5]` 直幅改為 4:3 並用 `front.jpg`（目錄中無直幅照片）；16:7 寬幅位改 `wide.jpg`（6443×3046，2.12 瀑布全景）；三政策頁 OG image 統一改用 `pool.jpg`。
+- 校驗：程式碼共 5 處 `/images/` 引用，missing=0、unused=0（五張照片全數使用），read_lints 0 錯誤。
+- 署名處理（合規）：五張照片的 EXIF／IPTC 中繼資料均已被移除，無從確認各張的作者與原始授權頁，因此圖說改為中性表述「Wikimedia Commons 公開授權作品，詳細作者與授權條款見本頁『權威資料來源』與 IMAGE-LICENSES.md」，避免在作者不明時錯誤署名（CC 授權以正確署名為條件，錯標仍有侵權風險）。`IMAGE-LICENSES.md` 改為「實際檔案清單（作者待人工核對）＋原始預期來源供比對」，`public/images/README.txt` 同步更新。
+- 待辦：請提供五張照片各自的攝影者與授權條款（或對照 IMAGE-LICENSES.md 的原 Wikimedia 來源頁逐一比對縮圖），以便把作者姓名補回圖說；另建議壓縮圖片（現為 3.1–7.5 MB，寬幅圖 7.47 MB 偏大，會拖慢 LCP）。
+
+「詳細交通」板塊擴充（2026-09-02）：
+- 由 4 張卡擴充為 6 張：臺鐵平溪線 → 公車／台灣好行 → **從機場出發（新增）** → **計程車／包車（新增，原與自駕合併於同一卡）** → 開車自駕（原「開車與計程車」改寫） → 十分友善步道（移至最末）。
+- 機場路線：桃園國際機場（TPE）→ 機場捷運至臺北車站 → 臺鐵 → 瑞芳 → 平溪線 → 十分站（約 2–2.5 小時），或計程車／包車直達（約 70–90 分鐘）；臺北松山機場（TSA）→ 文湖線至終點木柵站 → 台灣好行 795 → 十分遊客中心（約 1.5–2 小時，與既有公車資訊互相銜接）。
+- 計程車／包車：瑞芳或十分車站接駁最省轉乘；市區約 1 小時、機場約 70–90 分鐘；費用依計費表或與車隊事先約定，本站不列費率數字；並提醒山區不易臨時叫車、回程需先約妥車輛或確認末班車。
+- 自駕補上主要動線（國道1號／3號 → 台62線 → 瑞芳 → 106 縣道；或木柵、深坑方向經 106 縣道），並說明山區道路狹窄、會車不易。
+- 新卡各給 id（#airport、#taxi、#driving）便於錨點；H2 與首段改寫為「從機場、市區到十分瀑布的完整抵達方式」並條列六種方式。
+- FAQ 新增「從桃園機場或松山機場怎麼去十分瀑布？」（共 10 問；JSON-LD FAQPage 由 faqs 陣列自動同步，無需另外維護）。
+- 所有時間與車程均採「約」並標註以官方即時資訊為準，未編造精確班次、費率與車位數，維持中立不推薦特定商家／車隊。
+
+照片壓縮／載入速度優化（2026-09-02）：
+- 工具：`scripts/compress-images.py`（Python 3 + Pillow 12.3.0，本機已內建，無須新增 npm 依賴；sharp／ffmpeg／ImageMagick 在本環境皆不可用）。`package.json` 新增 `pnpm images:compress` 指令以便重跑。
+- 參數：長邊限制——首屏 hero 與 16:7 寬幅 2000px，其餘 1600px（約為最大顯示寬度的 2 倍，足以應付高 DPI 螢幕）；JPEG quality=80／optimize／progressive／subsampling 4:2:2；另輸出 WebP quality=78。
+- 成效：**26.42 MB → JPEG 2.38 MB、WebP 1.85 MB（-93%）**。首屏 hero 由 3.03 MB 降至 458 KB（WebP），直接改善 LCP；16:7 寬幅圖由 7.13 MB 降至 437 KB。
+- 前端：5 處 `<img>` 改為 `<picture>`（`<source type="image/webp">` 優先，JPEG 為回退），並同步更新 width／height 為壓縮後實際尺寸以避免 CLS；`<picture>` 加上 block／w-full，首屏維持 `absolute inset-0`。OG image 與 JSON-LD image 維持 JPEG（社群爬蟲相容性較佳）。
+- 原圖保全：壓縮前原始檔完整複製至 `.image-originals/`（27.7 MB），該目錄已加入 `.gitignore`、不隨部署上傳；腳本一律以備份檔為來源，重複執行不會二次壓縮。
+- 驗證：5 個 WebP 引用全部存在、read_lints 0 錯誤；`public/images` 部署目錄總計 4.22 MB（瀏覽器實際只會下載 WebP 或 JPEG 其中一種，約 1.85–2.38 MB）。
