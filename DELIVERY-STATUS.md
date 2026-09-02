@@ -30,8 +30,9 @@
 - `scripts/audit-source.mjs`／`audit-language.mjs` Windows 路徑修復，本地實跑：source PASS、language PASS。
 - 待辦（需在聯網環境完成）：`pnpm-lock.yaml` 目前僅含 `importers` 段、缺少 `packages` 解析段；請執行一次 `corepack pnpm install` 讓 lockfile 補全，再跑 `pnpm check` 與 `pnpm build` 完成 CI 閘門。
 
-CI 閘門修復（2026-09-02，Cloudflare 建置環境實測，兩輪）：
+CI 閘門修復（2026-09-02，Cloudflare 建置環境實測，多輪）：
 - lockfile 已由 CI 側確認完整：`pnpm install --frozen-lockfile` 通過 supply-chain 校驗（487 entries），解析階段跳過、316 套件成功安裝。
 - CI 失敗點為 `[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild@0.28.1, esbuild@0.28.2, workerd@1.20260828.1`。
 - 正確根因（pnpm 11 breaking change）：pnpm 11 的構建設置**只從 `pnpm-workspace.yaml` 讀取**；`.npmrc` 僅認 auth／registry，`package.json` 的 `pnpm.onlyBuiltDependencies` 欄位亦不再生效。專案 `pnpm-workspace.yaml` 原為 `allowBuilds` 占位文本（`set this to true or false`），等於未放行。
-- 已修正：`pnpm-workspace.yaml` → `allowBuilds: { esbuild: true, workerd: true }`；`.npmrc` 清理為註釋；`package.json` 移除無效的 `pnpm.onlyBuiltDependencies`。重跑 CI 應可通過依賴安裝、進入 `pnpm check`／`pnpm build` 階段。
+- 已修正：`pnpm-workspace.yaml` → `allowBuilds: { esbuild: true, workerd: true }`；`.npmrc` 清理為註釋；`package.json` 移除無效的 `pnpm.onlyBuiltDependencies`。
+- 第三輪（構建階段）：依賴安裝已通過（allowBuilds 生效、postinstall 全數 Done、`Done in 15.3s`）。`astro build` 失敗：`The provided Wrangler config main field (dist/_worker.js/index.js) doesn't point to an existing file`。根因：`wrangler.jsonc` 手寫 `main`／`assets` 指向尚不存在的建置產物，`@cloudflare/vite-plugin` 在 astro sync 階段硬校驗路徑。依官方文件（@astrojs/cloudflare v14）：`main` 與 `assets` 由適配器自動生成，不應手動設置。已將 `wrangler.jsonc` 精簡為 `name`＋`compatibility_date`。重跑 CI 應可完成 `astro build`。
