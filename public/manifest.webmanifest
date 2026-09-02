@@ -1,0 +1,40 @@
+{
+  "name": "十分瀑布旅遊指南｜平溪區交通、開放時間與實用資訊",
+  "short_name": "十分瀑布",
+  "description": "非營利十分瀑布（Shifen Waterfall）旅遊指南：開放時間、免費入園、交通、天氣、實用設施與歷史傳說。",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7fbf9",
+  "theme_color": "#0d2b26",
+  "lang": "zh-Hant-TW",
+  "categories": ["travel", "tourism"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

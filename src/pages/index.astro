@@ -1,20 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import WeatherSection from '../components/WeatherSection.astro';
+import HistorySection from '../components/HistorySection.astro';
+import StoriesSection from '../components/StoriesSection.astro';
+import FacilitiesSection from '../components/FacilitiesSection.astro';
 
 const pageTitle = '十分瀑布｜新北市平溪區交通、開放時間、門票與旅遊指南';
-const pageDescription = '十分瀑布完整繁體中文旅遊指南：開放與免費入園資訊、十分車站與公車交通、停車、友善步道、觀瀑重點、周邊景點、美食、Google 地圖與常見問答。';
+const pageDescription = '十分瀑布完整繁體中文旅遊指南：歷史背景與傳說、開放與免費入園資訊、十分車站與公車交通、停車、友善步道、實用設施（廁所、餐飲、住宿、補給）、觀瀑重點、周邊景點、天氣、Google 地圖與常見問答。';
 
 const pageUrl = Astro.site ? new URL('/', Astro.site).href : undefined;
 const entityId = Astro.site ? new URL('/#shifen-waterfall', Astro.site).href : '#shifen-waterfall';
+const heroImageUrl = Astro.site ? new URL('/images/shifen-waterfall-hero.jpg', Astro.site).href : undefined;
 
 const attractionSchema = {
   '@context': 'https://schema.org',
   '@type': ['TouristAttraction', 'LocalBusiness'],
   '@id': entityId,
   name: '十分瀑布',
-  alternateName: ['Shifen Waterfall', '十分瀑布公園', '彩虹淵'],
+  alternateName: ['Shifen Waterfall', '十分瀑布公園', '彩虹淵', '平溪區 十分瀑布', '新北市 十分瀑布'],
   description: '位於新北市平溪區、基隆河上的垂簾型瀑布，以寬闊水幕、水霧與晴日彩虹景觀聞名。',
   ...(pageUrl ? { url: pageUrl } : {}),
+  ...(heroImageUrl ? { image: [heroImageUrl] } : {}),
   telephone: '+886-2-2495-8409',
   isAccessibleForFree: true,
   address: {
@@ -50,7 +56,7 @@ const attractionSchema = {
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '4.5',
-    ratingCount: 29134,
+    ratingCount: 29127,
     bestRating: '5',
     worstRating: '1',
   },
@@ -78,6 +84,9 @@ const faqs = [
   { q: '輪椅或嬰兒車可以前往嗎？', a: '可以優先使用十分友善步道。新北市已建置平緩坡道並持續串接無障礙通行動線；山區環境仍可能受天候、施工或現場管制影響，建議出發前向十分遊客中心確認。' },
   { q: '開車去十分瀑布方便停車嗎？', a: '官方景點資訊列有停車場設施，十分遊客中心周邊亦有導引。假日山區道路與停車需求較大，建議提早抵達或改搭臺鐵平溪線、公車等大眾運輸。' },
   { q: '十分瀑布和十分老街適合排在同一天嗎？', a: '很適合。兩者距離近，可把十分車站、十分老街、靜安吊橋與十分瀑布串成半日行程；若再延伸到平溪、望古或菁桐，可安排較完整的平溪線一日遊。' },
+  { q: '十分瀑布附近有廁所、停車或補給嗎？', a: '十分遊客中心與園區內設有公共衛生間，遊客中心周邊有停車場，十分車站與老街一帶有雜貨、便利商店等小型補給點。詳細的類型中立清單請見本站「實用設施」段落；實際營業狀態以現場公告為準。' },
+  { q: '雨天或颱風天適合去十分瀑布嗎？', a: '雨後水量往往更充沛、水幕更壯觀，但步道濕滑、溪水風險也會上升；豪雨、颱風或雷擊風險期間，官方可能實施入園管制。出發前請查看新北旅客最新公告，並以現場管制為準。' },
+  { q: '平溪或十分有加油站、充電站嗎？', a: '平溪區內加油站與電動車充電點有限，自駕旅客建議在進入山區前，於瑞芳或 106 縣道沿線等外圍地區完成加油與充電規劃，避免山區補給不便。' },
 ];
 
 const faqSchema = {
@@ -89,24 +98,47 @@ const faqSchema = {
     acceptedAnswer: { '@type': 'Answer', text: a },
   })),
 };
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '十分瀑布（Shifen Waterfall）', ...(pageUrl ? { item: pageUrl } : {}) },
+    { '@type': 'ListItem', position: 2, name: '平溪區' },
+    { '@type': 'ListItem', position: 3, name: '新北市' },
+    { '@type': 'ListItem', position: 4, name: '臺灣' },
+  ],
+};
 ---
 <BaseLayout title={pageTitle} description={pageDescription}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(attractionSchema)}></script>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
 
   <section class="relative min-h-[78svh] overflow-hidden bg-[#071d1a] text-white">
-    <img src="/images/shifen-waterfall-hero.jpg" alt="十分瀑布寬闊水幕與平溪山林" width="1800" height="1200" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover opacity-72" />
+    <img src="/images/shifen-waterfall-hero.jpg" alt="十分瀑布寬闊水幕與平溪山林" width="1800" height="1200" class="absolute inset-0 h-full w-full object-cover opacity-72" />
     <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,29,26,.94)_0%,rgba(7,29,26,.64)_44%,rgba(7,29,26,.18)_72%,rgba(7,29,26,.48)_100%)]"></div>
     <div class="absolute inset-0 opacity-30" style="background:repeating-linear-gradient(90deg,transparent 0 34px,rgba(255,255,255,.09) 35px 36px);"></div>
     <div class="container relative z-10 flex min-h-[78svh] items-end py-16 sm:py-20 lg:items-center">
       <div class="max-w-3xl">
+        <nav aria-label="地理路徑" class="mb-4">
+          <ol class="flex flex-wrap items-center gap-1.5 text-sm text-white/60">
+            <li class="font-semibold text-white/85">十分瀑布（Shifen Waterfall）</li>
+            <li aria-hidden="true">›</li>
+            <li>平溪區</li>
+            <li aria-hidden="true">›</li>
+            <li>新北市</li>
+            <li aria-hidden="true">›</li>
+            <li>臺灣</li>
+          </ol>
+        </nav>
         <div class="mb-5 flex flex-wrap gap-2">
           <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm backdrop-blur">新北市 · 平溪區</span>
           <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm backdrop-blur">基隆河 · 垂簾型瀑布</span>
         </div>
         <p class="mb-3 text-sm font-bold tracking-[.24em] text-[#bce8dc]">十分瀑布 · 平溪山城水景</p>
-        <h1 class="font-serif text-5xl font-bold leading-[1.08] tracking-tight sm:text-6xl lg:text-8xl">山城裡的一道<br /><span class="text-[#c7f0e5]">白色水幕</span></h1>
-        <p class="mt-6 max-w-2xl text-base leading-8 text-white/82 sm:text-lg">走進平溪山谷，沿基隆河聽見水聲逐漸放大。十分瀑布以寬闊的垂簾式水幕、水霧與晴日可能出現的彩虹著稱，也因此有「彩虹淵」與「臺灣尼加拉瀑布」的別稱。</p>
+        <h1 class="font-serif text-5xl font-bold leading-[1.08] tracking-tight sm:text-6xl lg:text-8xl">十分瀑布<br /><span class="text-[#c7f0e5]">山城裡的一道白色水幕</span></h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-white/82 sm:text-lg">十分瀑布（Shifen Waterfall）是官方園區名稱「十分瀑布公園」最常被使用的稱呼，位於臺灣新北市平溪區、基隆河上游。走進平溪山谷，沿基隆河聽見水聲逐漸放大。這座寬闊的垂簾式水幕以水霧與晴日可能出現的彩虹著稱，也因此有「彩虹淵」與「臺灣尼加拉瀑布」的別稱。</p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a href="#visit" class="btn bg-white text-[#0d2b26] hover:-translate-y-0.5">規劃參觀</a>
           <a href="https://maps.app.goo.gl/tf7NwV2xuaYJ4ZiQ8" target="_blank" rel="noopener external" class="btn border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/18">開啟 Google 地圖</a>
@@ -118,7 +150,7 @@ const faqSchema = {
 
   <section class="border-b border-[#dbeae5] bg-white">
     <div class="container grid gap-px bg-[#dbeae5] sm:grid-cols-2 lg:grid-cols-4">
-      <div class="bg-white px-6 py-7"><p class="text-xs font-bold tracking-widest text-[#668078]">GOOGLE 地圖評分快照</p><p class="mt-2 text-3xl font-bold text-[#0d2b26]">4.5 <span class="text-base font-medium text-[#668078]">/ 5</span></p><p class="text-sm text-[#6d827c]">29,134 則評分（依使用者提供資料）</p></div>
+      <div class="bg-white px-6 py-7"><p class="text-xs font-bold tracking-widest text-[#668078]">GOOGLE 地圖評分快照</p><p class="mt-2 text-3xl font-bold text-[#0d2b26]">4.5 <span class="text-base font-medium text-[#668078]">/ 5</span></p><p class="text-sm text-[#6d827c]">29,127 則評分（依使用者提供資料）</p></div>
       <div class="bg-white px-6 py-7"><p class="text-xs font-bold tracking-widest text-[#668078]">門票</p><p class="mt-2 text-3xl font-bold text-[#0d2b26]">免費</p><p class="text-sm text-[#6d827c]">依新北市官方景點資訊</p></div>
       <div class="bg-white px-6 py-7"><p class="text-xs font-bold tracking-widest text-[#668078]">友善步道</p><p class="mt-2 text-3xl font-bold text-[#0d2b26]">約 400 m</p><p class="text-sm text-[#6d827c]">官方資料：約 15 分鐘至園區入口</p></div>
       <div class="bg-white px-6 py-7"><p class="text-xs font-bold tracking-widest text-[#668078]">建議停留</p><p class="mt-2 text-3xl font-bold text-[#0d2b26]">1.5–2.5 小時</p><p class="text-sm text-[#6d827c]">瀑布＋步道的舒適節奏</p></div>
@@ -150,6 +182,9 @@ const faqSchema = {
       </div>
     </div>
   </section>
+
+  <HistorySection />
+  <StoriesSection />
 
   <section id="visit" class="section bg-[#0d2b26] text-white">
     <div class="container">
@@ -217,6 +252,10 @@ const faqSchema = {
     </div>
   </section>
 
+  <WeatherSection />
+
+  <FacilitiesSection />
+
   <section id="nearby" class="section bg-white">
     <div class="container">
       <div class="grid gap-12 lg:grid-cols-[1fr_1fr]">
@@ -267,15 +306,18 @@ const faqSchema = {
     </div>
   </section>
 
-  <section class="section bg-[#f5faf8]">
+  <section id="sources" class="section bg-[#f5faf8]">
     <div class="container">
       <div class="rounded-[2rem] border border-[#d4e6df] bg-white p-7 sm:p-10">
         <div class="grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
-          <div><p class="section-kicker">權威資料來源</p><h2 class="mt-2 font-serif text-3xl font-bold">權威外鏈與資料對照</h2><p class="mt-3 text-sm leading-7 text-[#63766f]">為了讓搜尋引擎與讀者都能清楚確認實體，本頁將景點名稱、地理位置、地址、官方電話、開放資訊與權威資料來源交叉對照。</p></div>
-          <div class="grid gap-4 sm:grid-cols-2">
+          <div><p class="section-kicker">權威資料來源</p><h2 class="mt-2 font-serif text-3xl font-bold">權威外鏈與資料對照</h2><p class="mt-3 text-sm leading-7 text-[#63766f]">為了讓搜尋引擎與讀者都能清楚確認實體，本頁將景點名稱、地理位置、地址、官方電話、開放資訊與權威資料來源交叉對照。所有資訊均以官方與公開資料為準，本站不包含任何商業性推薦。</p></div>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <a href="https://newtaipei.travel/zh-tw/Attractions/Detail/109612" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">新北市政府觀光旅遊局</p><p class="mt-2 font-bold">十分瀑布公園｜新北旅客</p><p class="mt-1 text-sm text-[#687b75]">地址、電話、門票、開放時間與設施。</p></a>
             <a href="https://www.taiwan.net.tw/m1.aspx?id=2188&sNo=0001091" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">交通部觀光署</p><p class="mt-2 font-bold">十分風景特定區</p><p class="mt-1 text-sm text-[#687b75]">地理、瀑布型態、平溪線與周邊交通。</p></a>
             <a href="https://newtaipei.travel/zh-tw/regional/sightseeing/12" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">新北旅客 · 平溪區域頁</p><p class="mt-2 font-bold">公車、景點與地方飲食</p><p class="mt-1 text-sm text-[#687b75]">795、846 等公車脈絡與平溪區域旅遊資訊。</p></a>
+            <a href="https://www.cwa.gov.tw/" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">交通部中央氣象署</p><p class="mt-2 font-bold">臺灣天氣與警特報</p><p class="mt-1 text-sm text-[#687b75]">豪雨、颱風等天氣警特報；山區出遊的天氣權威來源。</p></a>
+            <a href="https://www.railway.gov.tw/" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">國營臺灣鐵路公司</p><p class="mt-2 font-bold">平溪線時刻與營運資訊</p><p class="mt-1 text-sm text-[#687b75]">十分站班次、誤點與營運調整的官方來源。</p></a>
+            <a href="https://open-meteo.com/" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">Open-Meteo</p><p class="mt-2 font-bold">本站天氣資料來源</p><p class="mt-1 text-sm text-[#687b75]">免費天氣 API（非官方氣象單位），天氣僅供行程參考。</p></a>
             <a href="https://maps.app.goo.gl/tf7NwV2xuaYJ4ZiQ8" target="_blank" rel="noopener external" class="rounded-2xl border border-[#d8e7e2] p-5 hover:border-[#8dbdad]"><p class="text-xs font-bold tracking-widest text-[#728780]">Google Maps</p><p class="mt-2 font-bold">十分瀑布</p><p class="mt-1 text-sm text-[#687b75]">使用者提供的地圖實體、導航地址與位置。</p></a>
           </div>
         </div>

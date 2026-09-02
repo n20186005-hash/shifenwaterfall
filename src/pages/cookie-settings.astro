@@ -101,7 +101,8 @@ const description = '管理十分瀑布旅遊指南的必要、分析、偏好�
         savedAtMonth: '2026-09',
       };
       localStorage.setItem(KEY, JSON.stringify(value));
-      setStatus('已儲存偏好設定。重新載入頁面後會完整套用。');
+      window.dispatchEvent(new Event('consent-updated'));
+      setStatus('已儲存偏好設定，新設定已立即套用。');
     });
 
     reject?.addEventListener('click', () => {
@@ -114,6 +115,7 @@ const description = '管理十分瀑布旅遊指南的必要、分析、偏好�
         savedAtMonth: '2026-09',
       };
       localStorage.setItem(KEY, JSON.stringify(value));
+      window.dispatchEvent(new Event('consent-updated'));
       setStatus('已拒絕所有非必要項目；必要功能仍保持啟用。');
     });
   </script>

@@ -1,7 +1,8 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('../', import.meta.url).pathname;
+const root = fileURLToPath(new URL('../', import.meta.url));
 const forbidden = [new RegExp('example' + '\\.' + 'com','i'), new RegExp('local' + 'host','i'), new RegExp('chrome' + '-extension:' + '\\/\\/','i')];
 const textExt = new Set(['.astro','.ts','.js','.mjs','.json','.jsonc','.css','.md','.txt','.svg','.html']);
 const ext = (p) => p.slice(p.lastIndexOf('.'));

@@ -1,0 +1,55 @@
+---
+// StoriesSection.astro
+// 故事與傳說：依來源性質區分「有據可考」與「民間傳說」，
+// 維持中立科普立場——傳說反映地方記憶，不必然等同史料。
+const stories = [
+  {
+    kind: '民間傳說',
+    title: '「十分」地名從哪來？',
+    body: '一說早期墾戶以「十分」為一份、以股份制方式分配墾地；另一說山谷曾有多座工寮群聚，台語稱「十份寮」。兩種說法都說不清誰先誰後，卻共同指向這裡曾是靠人力與土地討生活的開墾聚落。',
+  },
+  {
+    kind: '有據可考',
+    title: '一條為運煤而生的鐵道',
+    body: '今天旅客搭乘的平溪線，前身是臺陽礦業在 1919 年動工、1921 年通車的運煤產業鐵路，1929 年收歸官營後客貨並用。蒸汽與柴油列車穿過老街的畫面，正是百年礦業記憶留下的軌跡。',
+  },
+  {
+    kind: '民間傳說',
+    title: '平溪天燈的起源',
+    body: '相傳清代道光年間，山區盜匪與紛爭頻繁，村民以施放天燈傳遞平安訊息、通報動靜；此後逢年過節放天燈祈福漸成傳統，發展為今日平溪放天燈、寫心願的元宵文化。',
+  },
+  {
+    kind: '有據可考',
+    title: '「彩虹淵」與「臺灣尼加拉瀑布」',
+    body: '十分瀑布水幕寬闊、水霧豐沛，晴日午後陽光斜照時容易出現彩虹，早年便有「彩虹淵」之稱；又因水幕氣勢，長期被媒體與遊記比作「臺灣尼加拉瀑布」，成為最有辨識度的別名。',
+  },
+];
+
+function kindClass(kind: string): string {
+  return kind === '有據可考'
+    ? 'bg-[#e2f2ed] text-[#1c6657]'
+    : 'bg-[#f6ecd6] text-[#8a6a31]';
+}
+---
+
+<section id="stories" class="section mist-bg">
+  <div class="container">
+    <p class="section-kicker">故事與傳說</p>
+    <h2 class="section-title">山城裡的傳說：地名、天燈與水幕</h2>
+    <p class="section-copy">本站依來源性質區分「有據可考」與「民間傳說」兩類徽章。傳說反映地方記憶與集體想像，不必然等同史料；有據可考者則以普遍流傳的史實脈絡為基礎。</p>
+
+    <div class="mt-10 grid gap-5 md:grid-cols-2">
+      {
+        stories.map((story) => (
+          <article class="card flex flex-col p-7">
+            <div>
+              <span class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${kindClass(story.kind)}`}>{story.kind}</span>
+            </div>
+            <h3 class="mt-4 font-serif text-2xl font-bold text-[#0d2b26]">{story.title}</h3>
+            <p class="mt-3 leading-7 text-[#526a63]">{story.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

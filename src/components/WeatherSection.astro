@@ -1,0 +1,158 @@
+---
+// WeatherSection.astro
+// Server Component：frontmatter 於伺服器端（Cloudflare Workers）執行，
+// 透過 Open-Meteo 取得即時天氣與未來多日預報，並以 Cache API 快取。
+import {
+  getWeather,
+  weatherCodeToZh,
+  weatherCodeToIconKey,
+  FORECAST_DAYS,
+  type WeatherData,
+  type WeatherIconKey,
+} from '../lib/weather';
+import type { CacheLike } from '../lib/weather';
+
+const runtime = Astro.locals as { runtime?: { caches?: CacheLike } };
+const weather: WeatherData | null = await getWeather(runtime?.runtime?.caches);
+
+// --- 圖示（Lucide 風格線條 SVG，經 set:html 注入靜態字串，無 XSS 風險） ---
+const ICON_PATHS: Record<WeatherIconKey, string> = {
+  sun:
+    '<circle cx="12" cy="12" r="4"/>' +
+    '<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  cloudSun:
+    '<path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>' +
+    '<path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41"/>',
+  cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  fog:
+    '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>' +
+    '<path d="M8 17h8M8 21h5"/>',
+  drizzle:
+    '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>' +
+    '<path d="M8 19v1M8 14v1M16 19v1M16 14v1M12 21v1M12 16v1"/>',
+  rain:
+    '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>' +
+    '<path d="M16 14v6M8 14v6M12 16v6"/>',
+  shower:
+    '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>' +
+    '<path d="M16 13v7M8 13v7M12 15v7"/>',
+  snow:
+    '<path d="M2 12h20M12 2v20M20 16l-4-4 4-4M4 8l4 4-4 4M16 4l-4 4-4-4M8 20l4-4 4 4"/>',
+  thunder:
+    '<path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .492 8.973"/>' +
+    '<path d="M13 12l-3 5h4l-3 5"/>',
+};
+
+function iconSvg(key: WeatherIconKey, className: string): string {
+  return (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    `stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="${className}" aria-hidden="true">` +
+    ICON_PATHS[key] +
+    '</svg>'
+  );
+}
+
+// --- 格式化輔助 ---
+function formatTime(iso: string): string {
+  const m = iso.match(/T(\d{2}:\d{2})/);
+  return m ? m[1] : iso;
+}
+
+function dayLabel(dateStr: string, idx: number): string {
+  if (idx === 0) return '今天';
+  if (idx === 1) return '明天';
+  const d = new Date(dateStr + 'T00:00:00Z');
+  return new Intl.DateTimeFormat('zh-TW', { timeZone: 'UTC', weekday: 'short' }).format(d);
+}
+
+function adviceFor(code: number): { title: string; body: string } {
+  if (code >= 95)
+    return { title: '雷雨警戒', body: '雷雨期間請避開溪邊、觀瀑平台與裸露步道，並依園區管制儘速離開。' };
+  if (code >= 61)
+    return { title: '雨天準備', body: '降雨時步道濕滑、水量更壯觀但風險提高；建議防滑鞋與雨具，遠離溪邊。' };
+  if (code >= 51)
+    return { title: '水氣較多', body: '毛毛雨與水霧容易沾濕鏡頭與衣物，帶件輕便防水外套較安心。' };
+  if (code === 0 || code === 1)
+    return { title: '晴日觀瀑', body: '晴日午後陽光斜照水霧，較有機會見到彩虹；下午人潮較多，可提早抵達。' };
+  return { title: '多雲山區', body: '山區天氣多變，午後可能轉雨；建議備妥雨具並留意新北旅客即時公告。' };
+}
+
+const advice = weather ? adviceFor(weather.now.weatherCode) : null;
+const nowIcon = weather ? iconSvg(weatherCodeToIconKey(weather.now.weatherCode), 'size-14 sm:size-16') : '';
+const precipToday = weather?.daily[0]?.precipProb ?? 0;
+---
+
+<section id="weather" class="section relative overflow-hidden bg-[#0d2b26] text-white">
+  <div class="absolute inset-0 opacity-25" style="background:radial-gradient(circle at 12% 0%, rgba(95,184,163,.28), transparent 42%), radial-gradient(circle at 95% 90%, rgba(20,70,58,.9), transparent 38%);"></div>
+  <div class="container relative z-10">
+    <p class="section-kicker !text-[#8ed1bf]">天氣預報</p>
+    <h2 class="section-title">出發前看一眼：十分瀑布即時天氣與未來預報</h2>
+    <p class="max-w-3xl text-white/68">平溪山區天氣變化快，晴雨往往影響觀瀑品質與步道安全。以下天氣資料由 Open-Meteo 提供（非官方氣象單位），可作為行程參考；豪雨或颱風期間請以中央氣象署警特報與園區現場管制為準。</p>
+
+    {
+      weather ? (
+        <>
+          <div class="mt-10 grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
+            <!-- 目前天氣 -->
+            <article class="rounded-[2rem] border border-white/12 bg-white/7 p-7 sm:p-9">
+              <div class="flex flex-wrap items-center justify-between gap-6">
+                <div>
+                  <p class="text-sm font-bold tracking-widest text-[#9dd8c8]">目前天氣 · 十分瀑布</p>
+                  <div class="mt-3 flex items-end gap-3">
+                    <span class="font-serif text-7xl font-bold leading-none sm:text-8xl">{weather.now.temperature}°</span>
+                    <div class="pb-1">
+                      <span set:html={nowIcon} />
+                    </div>
+                  </div>
+                  <p class="mt-3 text-lg text-white/78">{weatherCodeToZh(weather.now.weatherCode)}</p>
+                </div>
+                <dl class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/72 sm:grid-cols-2">
+                  <div><dt class="text-white/48">體感溫度</dt><dd class="mt-0.5 font-bold text-white">{weather.now.apparentTemperature}°</dd></div>
+                  <div><dt class="text-white/48">相對濕度</dt><dd class="mt-0.5 font-bold text-white">{weather.now.humidity}%</dd></div>
+                  <div><dt class="text-white/48">風速</dt><dd class="mt-0.5 font-bold text-white">{weather.now.windSpeed} km/h</dd></div>
+                  <div><dt class="text-white/48">降水（目前）</dt><dd class="mt-0.5 font-bold text-white">{weather.now.precipitation} mm</dd></div>
+                </dl>
+              </div>
+              <div class="mt-7 flex flex-wrap gap-2 border-t border-white/10 pt-5 text-sm">
+                <span class="rounded-full border border-white/15 bg-white/8 px-3 py-1">今日 {weather.daily[0]?.tempMax ?? '–'}° / {weather.daily[0]?.tempMin ?? '–'}°</span>
+                <span class="rounded-full border border-white/15 bg-white/8 px-3 py-1">降雨機率 {precipToday}%</span>
+                <span class="rounded-full border border-white/15 bg-white/8 px-3 py-1 text-white/60">更新於 {formatTime(weather.now.time)}</span>
+              </div>
+            </article>
+
+            <!-- 天氣與遊玩提示 -->
+            {advice && (
+              <article class="flex flex-col justify-between rounded-[2rem] border border-white/12 bg-white/7 p-7 sm:p-9">
+                <div>
+                  <p class="text-sm font-bold tracking-widest text-[#9dd8c8]">當下遊玩提示</p>
+                  <h3 class="mt-3 font-serif text-3xl font-bold text-[#c7f0e5]">{advice.title}</h3>
+                  <p class="mt-4 leading-8 text-white/72">{advice.body}</p>
+                </div>
+                <p class="mt-6 text-xs leading-6 text-white/48">山區午後易起霧轉雨；豪雨、颱風或雷擊風險期間，新北市政府可能實施入園管制，出發前請查新北旅客最新公告。</p>
+              </article>
+            )}
+          </div>
+
+          <!-- 未來多日預報 -->
+          <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+            {weather.daily.map((day, i) => (
+              <article class="rounded-2xl border border-white/12 bg-white/7 p-4 text-center">
+                <p class="text-xs font-bold text-[#9dd8c8]">{dayLabel(day.date, i)}</p>
+                <span set:html={iconSvg(weatherCodeToIconKey(day.weatherCode), 'mx-auto mt-3 size-8 text-[#d9f2ea]')} />
+                <p class="mt-3 font-serif text-xl font-bold leading-none">{day.tempMax}°<span class="ml-1 text-sm font-medium text-white/50">{day.tempMin}°</span></p>
+                <p class={`mt-2 text-xs ${day.precipProb >= 60 ? 'font-bold text-[#ffd97a]' : 'text-white/52'}`}>☔ {day.precipProb}%</p>
+              </article>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div class="mt-10 rounded-3xl border border-white/12 bg-white/7 p-8">
+          <h3 class="font-serif text-2xl font-bold">天氣資料暫時無法取得</h3>
+          <p class="mt-3 max-w-3xl text-white/70">十分瀑布位處平溪山區，天氣多變。出發前建議查看中央氣象署天氣預報與新北旅客公告；雨後水量可能更充沛，但步道濕滑與溪水風險也會上升。</p>
+        </div>
+      )
+    }
+
+    <p class="mt-6 text-xs leading-6 text-white/45">天氣資料來源：Open-Meteo（open-meteo.com）免費天氣 API，無需金鑰、無追蹤；座標對應十分瀑布（25.0482681, 121.7846723），時區 Asia/Taipei，預報未來 {FORECAST_DAYS} 日。快取時間 30 分鐘，實際請以中央氣象署為準。</p>
+  </div>
+</section>

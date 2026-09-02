@@ -1,0 +1,83 @@
+---
+// HistorySection.astro
+// 十分瀑布／平溪線歷史背景（科普內容，來源脈絡以官方資料與普遍史實為基礎，
+// 不寫入未經證實的精確細節；傳說部分由 StoriesSection 另行標示性質）。
+const timeline = [
+  {
+    era: '清代中晚期',
+    title: '入墾與聚落',
+    body: '漢人沿基隆河上游入墾，形成「十分寮」等聚落。地名的由來說法不一（有人說是股份制的墾拓方式，也有人指早期工寮群聚），無論何種說法，都指向這片山谷早在鐵道之前就已有人定居生活。',
+  },
+  {
+    era: '日治時期',
+    title: '煤業興起',
+    body: '平溪一帶陸續開採煤礦，山區聚落因礦業人口而成長。基隆河上游的煤層與河谷地形，讓這個山谷在二十世紀初成為北臺灣重要的煤礦產區之一。',
+  },
+  {
+    era: '1919–1921',
+    title: '平溪線鐵道誕生',
+    body: '臺陽礦業為運送煤炭，沿基隆河谷興建平溪線鐵道，1921 年通車。這條鐵道最初是「運煤的產業鐵路」，之後才逐漸承載客運，讓十分車站一帶成為山城生活中心。',
+  },
+  {
+    era: '1929',
+    title: '收歸官營',
+    body: '平溪線改由官方收購營運，客貨並用。沿線煤礦、農產與人流都靠這條單線鐵道進出山區，十分車站成為北臺灣少數保留「鐵道穿過老街」景觀的車站之一。',
+  },
+  {
+    era: '近代',
+    title: '觀瀑公園成形',
+    body: '新北市政府（改制前臺北縣）整建十分瀑布公園與友善步道，設置觀瀑平台並維持免費入園，讓一般旅客得以安全、親近地欣賞基隆河上游的水幕景觀。',
+  },
+];
+
+const facts = [
+  { label: '動工', value: '1919（運煤產業鐵道）' },
+  { label: '通車', value: '1921' },
+  { label: '收歸官營', value: '1929' },
+  { label: '今日定位', value: '北臺灣經典觀光鐵道' },
+];
+---
+
+<section id="history" class="section bg-white">
+  <div class="container">
+    <p class="section-kicker">歷史背景</p>
+    <h2 class="section-title">從礦業鐵道到觀瀑公園：十分瀑布的身世</h2>
+    <p class="section-copy">十分瀑布不只是「風景」。它所在的山城，走過煤業、鐵道與聚落開墾的百年時光。以下依時間順序整理與十分、平溪線相關的歷史脈絡，讓旅客在遊覽前先建立背景。</p>
+
+    <div class="mt-12 grid gap-10 lg:grid-cols-[1.1fr_.9fr]">
+      <ol class="space-y-8 border-l-2 border-[#cfe2dc]">
+        {
+          timeline.map((item) => (
+            <li class="relative pl-8">
+              <span class="absolute -left-[7px] top-1.5 size-3 rounded-full border-2 border-white bg-[#2b7a68] shadow"></span>
+              <p class="text-xs font-bold tracking-widest text-[#2b7a68]">{item.era}</p>
+              <h3 class="mt-1 font-serif text-2xl font-bold text-[#0d2b26]">{item.title}</h3>
+              <p class="mt-2 max-w-xl leading-7 text-[#526a63]">{item.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="space-y-6">
+        <article class="rounded-3xl bg-[#eef7f4] p-7">
+          <p class="text-sm font-bold text-[#2b7a68]">小知識｜瀑布是怎麼形成的？</p>
+          <h3 class="mt-2 font-serif text-2xl font-bold">河流侵蝕 × 岩層落差</h3>
+          <p class="mt-3 text-sm leading-7 text-[#526a63]">十分瀑布位在基隆河上游，河流侵蝕與斷層落差使河道形成階段落差；砂岩、頁岩等岩層抗蝕能力不同，長期切割出連續的瀑布群，十分瀑布正是其中最具規模的垂簾型水幕。水霧在陽光下偶見彩虹，是「彩虹淵」之名的由來。</p>
+        </article>
+        <article class="rounded-3xl border border-[#dce9e4] bg-[#f7fbf9] p-7">
+          <p class="text-sm font-bold text-[#2b7a68]">平溪線小檔案</p>
+          <dl class="mt-4 space-y-3">
+            {
+              facts.map((f) => (
+                <div class="flex items-baseline justify-between gap-4 border-b border-[#dce9e4] pb-3 text-sm last:border-0 last:pb-0">
+                  <dt class="text-[#6d827c]">{f.label}</dt>
+                  <dd class="font-bold text-[#173b33]">{f.value}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,78 @@
+---
+// FacilitiesSection.astro
+// 實用設施：僅說明「設施類型」與「所在區域」，不推薦或排名任何特定商家，
+// 維持非營利科普網站的中立客觀立場。實際營業狀態與收費以現場公告為準。
+const facilities = [
+  {
+    icon: 'WC',
+    name: '衛生間（WC）',
+    tag: '園區內',
+    body: '十分遊客中心與十分瀑布公園園區內設有公共衛生間。山區公共設施數量有限，建議出發前先於車站或遊客中心使用，避免臨時找廁所的困擾。',
+  },
+  {
+    icon: '停',
+    name: '停車',
+    tag: '遊客中心周邊',
+    body: '十分遊客中心周邊與園區設有停車場。假日山區停車需求大，車位與收費可能依時段調整；建議提早抵達，或直接改搭臺鐵平溪線與公車。',
+  },
+  {
+    icon: '餐',
+    name: '餐飲',
+    tag: '十分老街一帶',
+    body: '十分老街與平溪一帶有傳統小吃、古早味麵食、茶飲與簡餐等類型選擇。本站不推薦特定店家，依當日營業情況現場決定即可。',
+  },
+  {
+    icon: '宿',
+    name: '住宿',
+    tag: '平溪沿線',
+    body: '平溪、十分與沿線聚落有民宿與小型旅宿等類型。想體驗夜間山城與清晨水霧可考慮留宿，但請自行確認合法登記、評價與交通接駁。',
+  },
+  {
+    icon: '補',
+    name: '商超／補給',
+    tag: '十分老街一帶',
+    body: '十分車站與老街一帶有雜貨、便利商店等小型補給點，可購買飲水、雨具與基本用品。出發前若需要特定物品，建議先在市區備妥。',
+  },
+  {
+    icon: '油',
+    name: '加油與充電',
+    tag: '建議外圍',
+    body: '平溪區內加油站與電動車充電點有限。自駕旅客建議在進入山區前，於瑞芳、106 縣道沿線等外圍地區完成加油與充電規劃。',
+  },
+  {
+    icon: '飲',
+    name: '飲水與休憩',
+    tag: '園區內',
+    body: '山區濕熱、步道體感悶，建議自備飲水。十分遊客中心與園區內設有座椅、涼亭等休憩空間，可視體力安排停留節奏。',
+  },
+  {
+    icon: '親',
+    name: '無障礙與親子',
+    tag: '友善步道',
+    body: '十分友善步道以平緩坡道為主，對輪椅與嬰兒車較友善；建議從十分遊客中心方向進入。山區動線仍可能因天候或施工調整，出發前可先向遊客中心確認。',
+  },
+];
+---
+
+<section id="facilities" class="section bg-white">
+  <div class="container">
+    <p class="section-kicker">實用設施</p>
+    <h2 class="section-title">旅遊便利設施：類型中立清單</h2>
+    <p class="section-copy">為維持中立客觀，本站不推薦或排名任何特定商家，僅說明設施類型與所在區域，由旅客依現場情況自行選擇。實際營業狀態、收費與位置，請以現場公告與官方資訊為準。</p>
+
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        facilities.map((f) => (
+          <article class="rounded-3xl border border-[#dce9e4] bg-[#f7fbf9] p-6">
+            <div class="flex items-center justify-between">
+              <span class="grid size-11 place-items-center rounded-full bg-[#e2f2ed] font-serif text-lg font-bold text-[#1c6657]">{f.icon}</span>
+              <span class="rounded-full bg-[#eef7f4] px-2.5 py-1 text-[11px] font-bold text-[#2b7a68]">{f.tag}</span>
+            </div>
+            <h3 class="mt-4 font-serif text-xl font-bold text-[#0d2b26]">{f.name}</h3>
+            <p class="mt-2 text-sm leading-6 text-[#526a63]">{f.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
