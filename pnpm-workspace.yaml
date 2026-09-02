@@ -1,3 +1,5 @@
+# pnpm 11 统一配置入口（pnpm-workspace.yaml）
+# 构建脚本放行：esbuild（astro/vite 依赖）、workerd（wrangler 依赖）
 allowBuilds:
-  esbuild: set this to true or false
-  workerd: set this to true or false
+  esbuild: true
+  workerd: true
