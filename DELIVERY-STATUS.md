@@ -29,3 +29,8 @@
 - 首屏 hero `<img>` 移除非標準 `fetchpriority` 屬性（消除既有 TS lint 錯誤）。
 - `scripts/audit-source.mjs`／`audit-language.mjs` Windows 路徑修復，本地實跑：source PASS、language PASS。
 - 待辦（需在聯網環境完成）：`pnpm-lock.yaml` 目前僅含 `importers` 段、缺少 `packages` 解析段；請執行一次 `corepack pnpm install` 讓 lockfile 補全，再跑 `pnpm check` 與 `pnpm build` 完成 CI 閘門。
+
+CI 閘門修復（2026-09-02，Cloudflare 建置環境實測）：
+- lockfile 已由 CI 側確認完整：`pnpm install --frozen-lockfile` 通過 supply-chain 校驗（487 entries），解析階段跳過、316 套件成功安裝。
+- 首次 CI 失敗點為 `[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild@0.28.1, esbuild@0.28.2, workerd@1.20260828.1`——根因：`.npmrc` 用了單值寫法 `only-built-dependencies=esbuild`，pnpm 的 `.npmrc` 陣列設定必須以 `key[]=value` 書寫，allowlist 因而未生效。
+- 已修正：`.npmrc` 改為 `only-built-dependencies[]=esbuild`＋`only-built-dependencies[]=workerd`；`package.json` 同步新增 `pnpm.onlyBuiltDependencies`（esbuild、workerd）雙保險。重跑 CI 應可進入 `pnpm check`／`pnpm build` 階段。
