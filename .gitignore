@@ -1,7 +1,23 @@
+# 依賴與建置產物
 node_modules/
 dist/
 .astro/
 .wrangler/
+.wrangler-out/
+
+# 系統與編輯器
 .DS_Store
+Thumbs.db
+*.log
+
+# 環境變數與本機祕密（手動部署到 Cloudflare Workers，勿上傳）
+.env
+.env.*
+.dev.vars
+
 # 壓縮前的原始照片（27.7 MB，僅供重新產生高畫質輸出用，不部署）
 .image-originals/
+
+# CI / 安裝暫存（本機 sandbox 產生的記錄，不部署）
+ci-install.exit
+ci-install.log

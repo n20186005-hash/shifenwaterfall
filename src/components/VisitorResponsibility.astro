@@ -1,0 +1,67 @@
+---
+// VisitorResponsibility.astro
+// 科普與訪客責任：水域／水質、野生動物、零垃圾、安全與攝影倫理。
+// 內容為一般性山區河川旅遊科普，不杜撰未經證實的精確監測數值；
+// 實際開放與管制以新北旅客與園區現場公告為準。
+interface Topic {
+  icon: string;
+  title: string;
+  body: string;
+}
+
+const topics: Topic[] = [
+  {
+    icon: '水',
+    title: '水域與水質',
+    body: '十分瀑布位於基隆河上游，水質受集水區與上下游活動影響。請勿下水戲水、勿飲用溪水；雨後水量與濁度變化大，岸邊濕滑，務必留在觀瀑平台與步道範圍內。',
+  },
+  {
+    icon: '獸',
+    title: '野生動物',
+    body: '山區常見臺灣獼猴、鳥類、蛙類與昆蟲。請不餵食、不觸摸、保持安全距離；獼猴會主動靠近取食，隨身背包拉好、食物收妥，避免引發人猴衝突。',
+  },
+  {
+    icon: '圾',
+    title: '零垃圾與減塑',
+    body: '山城環境自淨能力有限。請帶走自己產生的垃圾，優先使用可重複容器與飲水，不採摘植物、不刻劃石壁，把乾淨的步道留給下一位旅客。',
+  },
+  {
+    icon: '安',
+    title: '安全與尊重',
+    body: '不跨越欄杆與警示線；雷雨、豪雨或颱風期間可能實施入園管制，請依現場指示。尊重在地居民、礦業與鐵道文化，拍照不阻礙鐵道通行與他人安全。',
+  },
+];
+---
+
+<section id="responsibility" class="section mist-bg">
+  <div class="container">
+    <div class="mb-9 max-w-3xl">
+      <p class="section-kicker">科普與訪客責任</p>
+      <h2 class="section-title">看懂這片山林，也守護它</h2>
+      <p class="section-copy">瀑布很美，但它是活的水系與野生動物的家。認識水質、野生動物與山區安全，能讓行程更安心，也讓這片平溪山林被溫柔對待。</p>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      {
+        topics.map((t) => (
+          <article class="flex gap-5 rounded-3xl border border-[#dce9e4] bg-white p-7">
+            <span class="grid size-12 shrink-0 place-items-center rounded-full bg-[#e2f2ed] font-serif text-xl font-bold text-[#1c6657]">{t.icon}</span>
+            <div>
+              <h3 class="font-serif text-xl font-bold text-[#0d2b26]">{t.title}</h3>
+              <p class="mt-2 text-sm leading-7 text-[#526a63]">{t.body}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="mt-7 rounded-[2rem] bg-[#0d2b26] p-7 text-white lg:p-9">
+      <div class="grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
+        <div><p class="text-sm font-bold tracking-widest text-[#8ed1bf]">出發前最後一檢查</p><h3 class="mt-2 font-serif text-3xl">天氣、裝備、與現場管制</h3></div>
+        <div class="text-white/72">
+          <p>出發前查看交通部中央氣象署預報與新北旅客最新公告；備妥雨具、飲水與防滑鞋，並以園區現場管制為最後依據。本站為非營利科普指南，不替代官方即時警示。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

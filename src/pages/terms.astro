@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-const title = '服務條款｜十分瀑布旅遊指南';
+import { withSiteName } from '../data/site';
+const title = withSiteName('服務條款');
 const description = '十分瀑布旅遊指南服務條款，說明網站性質、資訊準確性、內容與圖片授權、第三方服務及責任限制。';
 ---
 <BaseLayout title={title} description={description} image="/images/shifen-waterfall-pool.jpg">

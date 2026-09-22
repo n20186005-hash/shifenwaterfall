@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-const title = 'Cookie 設定｜十分瀑布旅遊指南';
+import { withSiteName } from '../data/site';
+const title = withSiteName('Cookie 設定');
 const description = '管理十分瀑布旅遊指南的必要、分析、偏好與行銷 Cookie 選項。Google Analytics 預設不載入，只有同意後啟用。';
 ---
 <BaseLayout title={title} description={description} image="/images/shifen-waterfall-pool.jpg">

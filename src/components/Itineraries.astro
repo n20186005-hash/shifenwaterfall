@@ -1,0 +1,120 @@
+---
+// Itineraries.astro
+// 按人群定制的遊覽方案 + 通用半日／全日路線（類型中立、不推薦特定商家）。
+interface Persona {
+  icon: string;
+  name: string;
+  who: string;
+  pace: string;
+  focus: string;
+  tip: string;
+}
+
+const personas: Persona[] = [
+  {
+    icon: '親',
+    name: '親子家庭',
+    who: '帶幼童或長輩的家庭旅客',
+    pace: '半日 · 低強度、多停留',
+    focus: '以十分遊客中心為起點走友善步道到觀瀑平台，回程串連十分老街放天燈、吃傳統小吃；廁所與休息點密集，節奏好掌控。',
+    tip: '避開午後雷陣雨與假日人潮高峰；隨身帶飲水與一件換洗衣物，嬰兒車可優先走友善步道。',
+  },
+  {
+    icon: '影',
+    name: '攝影自然',
+    who: '風景、鐵道與生態攝影愛好者',
+    pace: '全日 · 慢走、多停留構圖',
+    focus: '上午順光拍水幕、下午追水霧彩虹；觀景台與全景構圖兼顧，再沿平溪線收鐵道、老街與山城光影。',
+    tip: '備三腳架與防水相機袋；水霧大，鏡頭與手機注意防潮，午後雷陣雨前留意收器材。',
+  },
+  {
+    icon: '輕',
+    name: '低體力／無障礙',
+    who: '輪椅、嬰兒車或體力有限者',
+    pace: '1–1.5 小時 · 平緩動線',
+    focus: '從十分遊客中心方向進入友善步道（約 400 公尺、平緩坡道）直達觀瀑平台，原路折返，不勉強走階梯路段。',
+    tip: '出發前向十分遊客中心確認當日通行狀態；雨天坡道濕滑，建議有人陪同並放慢腳步。',
+  },
+];
+
+interface Route {
+  name: string;
+  duration: string;
+  steps: string[];
+}
+
+const routes: Route[] = [
+  {
+    name: '半日精華路線',
+    duration: '約 2.5–3 小時',
+    steps: [
+      '十分車站下車，沿鐵道與老街慢行',
+      '步行或經靜安吊橋前往十分遊客中心',
+      '走友善步道至觀瀑平台欣賞水幕',
+      '回程老街補給、體驗天燈，原路返回',
+    ],
+  },
+  {
+    name: '全日平溪線路線',
+    duration: '約 5–6 小時',
+    steps: [
+      '半日精華路線（十分車站→老街→吊橋→觀瀑）',
+      '續搭平溪線至平溪、菁桐或望古、嶺腳',
+      '依班次彈性停留：礦業記憶、鐵道與山城小鎮',
+      '傍晚前返回十分，避開末班車人潮',
+    ],
+  },
+];
+---
+
+<section id="itinerary" class="section bg-white">
+  <div class="container">
+    <div class="mb-9 max-w-3xl">
+      <p class="section-kicker">推薦遊覽路線</p>
+      <h2 class="section-title">按人群與時間安排你的十分瀑布行程</h2>
+      <p class="section-copy">同樣的瀑布，不同旅伴與體力會有不同走法。以下提供三種人群路線與半日／全日兩種通用模板，僅說明節奏與重點，不排名或推薦特定店家。</p>
+    </div>
+
+    <div class="grid gap-5 lg:grid-cols-3">
+      {
+        personas.map((p) => (
+          <article class="flex flex-col rounded-3xl border border-[#dce9e4] bg-[#f7fbf9] p-7">
+            <div class="flex items-center gap-3">
+              <span class="grid size-12 place-items-center rounded-full bg-[#0d2b26] font-serif text-xl font-bold text-[#c7f0e5]">{p.icon}</span>
+              <div>
+                <h3 class="font-serif text-2xl font-bold text-[#0d2b26]">{p.name}</h3>
+                <p class="text-xs text-[#71857f]">{p.who}</p>
+              </div>
+            </div>
+            <p class="mt-5 rounded-full bg-[#eef7f4] px-3 py-1.5 text-center text-sm font-bold text-[#2b7a68]">{p.pace}</p>
+            <p class="mt-4 text-sm leading-7 text-[#526a63]">{p.focus}</p>
+            <p class="mt-4 rounded-2xl bg-[#fff7e9] px-4 py-3 text-sm leading-6 text-[#7a5a1f]"><span class="font-bold">小提醒：</span>{p.tip}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="mt-7 grid gap-5 lg:grid-cols-2">
+      {
+        routes.map((r) => (
+          <article class="rounded-3xl border border-[#dce9e4] bg-white p-7">
+            <div class="flex items-baseline justify-between gap-4">
+              <h3 class="font-serif text-2xl font-bold text-[#0d2b26]">{r.name}</h3>
+              <span class="shrink-0 rounded-full bg-[#0d2b26] px-3 py-1 text-sm font-bold text-[#c7f0e5]">{r.duration}</span>
+            </div>
+            <ol class="mt-5 space-y-3">
+              {
+                r.steps.map((step, i) => (
+                  <li class="flex gap-3 text-sm leading-7 text-[#526a63]">
+                    <span class="grid size-6 shrink-0 place-items-center rounded-full bg-[#e2f2ed] text-xs font-bold text-[#1c6657]">{i + 1}</span>
+                    <span>{step}</span>
+                  </li>
+                ))
+              }
+            </ol>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

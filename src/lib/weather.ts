@@ -1,5 +1,5 @@
 // 十分瀑布天氣資料層（Server 端）
-// 使用 Open-Meteo 免費天氣 API（https://open-meteo.com，無需金鑰、非營利適用）。
+// 使用 Open-Meteo 天氣 API（https://open-meteo.com）。
 // 在 Astro `output: 'server'` 模式下，此模組由伺服器（Cloudflare Workers）執行，
 // 並透過 Cloudflare Cache API 快取回應，避免每次頁面請求都向 Open-Meteo 索取資料。
 
@@ -8,7 +8,7 @@ export const WEATHER_LON = 121.7846723;
 export const WEATHER_TZ = 'Asia/Taipei';
 export const FORECAST_DAYS = 7;
 
-/** 快取 TTL：30 分鐘。Open-Meteo 免費層建議避免過度頻繁請求。 */
+/** 快取 TTL：30 分鐘，避免過度頻繁向外部天氣服務重複請求。 */
 const CACHE_TTL_SECONDS = 1800;
 /** 外部請求硬性逾時（毫秒）。 */
 const WEATHER_TIMEOUT_MS = 8000;
@@ -32,6 +32,7 @@ export interface WeatherDay {
   tempMax: number;
   tempMin: number;
   precipProb: number;
+  uvIndex: number;
 }
 
 export interface WeatherData {
@@ -83,7 +84,7 @@ function buildRequestUrl(): string {
   );
   u.searchParams.set(
     'daily',
-    'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+    'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max',
   );
   return u.toString();
 }
@@ -99,6 +100,7 @@ function normalize(payload: OpenMeteoResponse): WeatherData | null {
     tempMax: Math.round(d.temperature_2m_max[i] ?? 0),
     tempMin: Math.round(d.temperature_2m_min[i] ?? 0),
     precipProb: d.precipitation_probability_max?.[i] ?? 0,
+    uvIndex: Math.round(d.uv_index_max?.[i] ?? 0),
   }));
 
   return {

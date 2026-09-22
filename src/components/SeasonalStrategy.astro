@@ -1,0 +1,100 @@
+---
+// SeasonalStrategy.astro
+// 季度／氣候遊覽策略表（科普內容）。
+// 下列季節特徵參考交通部中央氣象署（CWA）氣候常年值（30 年氣候態）與平溪地區
+// 普遍氣候特徵整理，僅作為行程規劃參考，不杜撰未經證實的精確統計數值；
+// 實際天氣與開園狀態請以出發前中央氣象署預報與新北旅客公告為準。
+interface SeasonRow {
+  period: string;
+  climate: string;
+  view: string;
+  safety: string;
+  rating: number; // 1–5，推薦程度
+}
+
+const seasons: SeasonRow[] = [
+  {
+    period: '春季 · 3–5 月',
+    climate: '氣溫回暖、東北季風減弱；鋒面接近時山區水氣增多，偶有降雨，瀑布水量開始回升。',
+    view: '遊客相對少、林相轉綠；平日前往最能享受靜謐的水幕與步道。',
+    safety: '薄外套與備用雨具；留意午後飄雨使石階濕滑。',
+    rating: 4,
+  },
+  {
+    period: '梅雨 · 5–6 月',
+    climate: '華南與梅雨鋒面帶來連續降雨，基隆河水量豐沛，瀑布氣勢最盛、彩虹機會也高。',
+    view: '水幕最壯觀的一季；但雲霧多、能見度較低，遠景構圖受影響。',
+    safety: '防滑鞋與雨衣必備；雨後溪水易暴漲，遵守園區管制、不靠近岸邊。',
+    rating: 3,
+  },
+  {
+    period: '夏季 · 6–9 月',
+    climate: '高溫炎熱、午後雷陣雨頻繁，7–9 月為颱風季；官方多採夏季時段並可能延長開園。',
+    view: '綠意最濃、水量穩定；晴日午後水霧常見彩虹，但日頭強、人潮多。',
+    safety: '防曬、充足飲水、防雷擊；颱風或豪雨期間可能封園，出發前務必查公告。',
+    rating: 4,
+  },
+  {
+    period: '秋季 · 9–11 月',
+    climate: '颱風漸少、天氣穩定、氣溫舒適，常被視為最適合步行與攝影的一季。',
+    view: '能見度佳、光線柔和；水幕仍維持一定水量，適合慢走與構圖。',
+    safety: '一般裝備即可；仍是山區，保留雨具與飲水備用。',
+    rating: 5,
+  },
+  {
+    period: '冬季 · 12–2 月',
+    climate: '東北季風強、濕冷多雨霧，水量較夏季小，但水霧與靜謐感強、遊客最少。',
+    view: '霧嵐與水氣營造空靈氛圍；午後易起霧，遠景較難拍清。',
+    safety: '保暖防風外套；濕冷環境更要留意步道濕滑與體溫流失。',
+    rating: 3,
+  },
+];
+
+function ratingDots(n: number): string {
+  const full = Math.max(0, Math.min(5, n));
+  return '●'.repeat(full) + '○'.repeat(5 - full);
+}
+---
+
+<section id="season" class="section bg-[#f5faf8]">
+  <div class="container">
+    <div class="mb-9 max-w-3xl">
+      <p class="section-kicker">季節與氣候策略</p>
+      <h2 class="section-title">什麼時候去最合適？按季節排行程</h2>
+      <p class="section-copy">平溪山區屬東北季風影響區，冬濕夏熱、梅雨與颱風明顯。下表依氣候特徵整理各時期的瀑布觀賞、安全裝備與推薦程度，幫助你依出行日期做準備。</p>
+    </div>
+
+    <div class="overflow-hidden rounded-[2rem] border border-[#d9e9e3] bg-white shadow-[0_24px_70px_rgba(13,43,38,.08)]">
+      <table class="w-full border-collapse text-left text-sm">
+        <thead>
+          <tr class="bg-[#0d2b26] text-white/85">
+            <th class="px-5 py-4 font-bold">時期</th>
+            <th class="px-5 py-4 font-bold">氣候與水量</th>
+            <th class="px-5 py-4 font-bold">觀瀑與攝影</th>
+            <th class="px-5 py-4 font-bold">安全與裝備</th>
+            <th class="px-5 py-4 font-bold text-center">推薦度</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            seasons.map((s, i) => (
+              <tr class:list={['align-top', i % 2 === 1 ? 'bg-[#f1f7f4]' : 'bg-white']}>
+                <td class="px-5 py-5">
+                  <p class="font-serif text-lg font-bold text-[#0d2b26]">{s.period}</p>
+                </td>
+                <td class="px-5 py-5 text-[#4a5f59]">{s.climate}</td>
+                <td class="px-5 py-5 text-[#4a5f59]">{s.view}</td>
+                <td class="px-5 py-5 text-[#4a5f59]">{s.safety}</td>
+                <td class="px-5 py-5 text-center">
+                  <span class="font-bold tracking-widest text-[#2b7a68]" aria-label={`推薦程度 ${s.rating} / 5`}>{ratingDots(s.rating)}</span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mt-5 text-xs leading-6 text-[#71867f]">策略依交通部中央氣象署（CWA）氣候常年值（30 年氣候態）與平溪地區普遍氣候特徵整理，僅供行程參考；實際天氣、水量與開園狀態請以出發前中央氣象署預報與新北旅客最新公告為準。</p>
+  </div>
+</section>

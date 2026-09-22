@@ -2,6 +2,7 @@
 // WeatherSection.astro
 // Server Component：frontmatter 於伺服器端（Cloudflare Workers）執行，
 // 透過 Open-Meteo 取得即時天氣與未來多日預報，並以 Cache API 快取。
+// 前端只呈現「看得懂、能做什麼」的建議，不暴露資料來源細節。
 import {
   getWeather,
   weatherCodeToZh,
@@ -65,21 +66,160 @@ function dayLabel(dateStr: string, idx: number): string {
   return new Intl.DateTimeFormat('zh-TW', { timeZone: 'UTC', weekday: 'short' }).format(d);
 }
 
-function adviceFor(code: number): { title: string; body: string } {
-  if (code >= 95)
-    return { title: '雷雨警戒', body: '雷雨期間請避開溪邊、觀瀑平台與裸露步道，並依園區管制儘速離開。' };
-  if (code >= 61)
-    return { title: '雨天準備', body: '降雨時步道濕滑、水量更壯觀但風險提高；建議防滑鞋與雨具，遠離溪邊。' };
-  if (code >= 51)
-    return { title: '水氣較多', body: '毛毛雨與水霧容易沾濕鏡頭與衣物，帶件輕便防水外套較安心。' };
-  if (code === 0 || code === 1)
-    return { title: '晴日觀瀑', body: '晴日午後陽光斜照水霧，較有機會見到彩虹；下午人潮較多，可提早抵達。' };
-  return { title: '多雲山區', body: '山區天氣多變，午後可能轉雨；建議備妥雨具並留意新北旅客即時公告。' };
+// 風速（km/h）→ 蒲福風級（級）
+function kmhToBeaufort(kmh: number): number {
+  if (kmh < 1) return 0;
+  if (kmh < 6) return 1;
+  if (kmh < 12) return 2;
+  if (kmh < 20) return 3;
+  if (kmh < 29) return 4;
+  if (kmh < 39) return 5;
+  if (kmh < 50) return 6;
+  if (kmh < 62) return 7;
+  if (kmh < 75) return 8;
+  if (kmh < 89) return 9;
+  if (kmh < 103) return 10;
+  if (kmh < 118) return 11;
+  return 12;
 }
 
-const advice = weather ? adviceFor(weather.now.weatherCode) : null;
-const nowIcon = weather ? iconSvg(weatherCodeToIconKey(weather.now.weatherCode), 'size-14 sm:size-16') : '';
+// --- 智能建議引擎：由天氣資料直接推導「訪客下一步該做什麼」 ---
+// 回傳四類動態內容；不滿足條件者不進陣列（前端即不渲染），避免把所有條目堆在頁面。
+interface Advice {
+  alert: string | null; // 紅色置頂：最劇烈天氣（雷暴／強風／極端高溫）
+  risk: string[]; // 黃色風險提醒（中大雨／強風／濃霧）
+  outfit: string[]; // 出行穿搭
+  plan: string[]; // 游玩安排
+  items: string[]; // 随身物品
+}
+
+function buildAdvice(w: WeatherData): Advice {
+  const now = w.now;
+  const today = w.daily[0];
+  const code = now.weatherCode;
+  const precip = today?.precipProb ?? 0;
+  const tMax = today?.tempMax ?? 0;
+  const tMin = today?.tempMin ?? 0;
+  const uv = today?.uvIndex ?? 0;
+  const windB = kmhToBeaufort(now.windSpeed);
+
+  const isThunder = code >= 95;
+  const isHeavyRain = (code >= 62 && code <= 67) || (code >= 80 && code <= 82);
+  const isDrizzle = code >= 51 && code <= 61;
+  const isFog = code >= 45 && code <= 48;
+  const isClear = code === 0 || code === 1;
+  const isOvercast = code === 3;
+
+  const outfit: string[] = [];
+  const plan: string[] = [];
+  const items: string[] = [];
+  const risk: string[] = [];
+  let alert: string | null = null;
+
+  // 降水相關
+  if (precip >= 60) {
+    outfit.push('降雨機率偏高，建議攜帶雨具');
+    plan.push('優先安排遮蔭與室內休息點，溪邊觀瀑與山區步道視雨勢延後');
+    items.push('雨傘 / 雨衣');
+  }
+  if (isDrizzle) {
+    outfit.push('有小雨，路面與石階濕滑，走路注意防滑');
+    plan.push('露天觀景體驗較差，可搭配老街與遊客中心室內動線');
+    items.push('摺疊傘');
+  }
+  if (isHeavyRain) {
+    risk.push('降雨較強，避開山谷、低窪與溪邊步道；觀瀑平台與接駁可能受影響');
+    plan.push('不建議長時間戶外遊玩，水上與高處項目可能關閉');
+    items.push('雨衣（風大時不建議長柄傘）');
+  }
+  if (isThunder) {
+    alert = '劇烈天氣：當地有雷暴發展，建議調整行程，避免前往山區、溪邊與高地等危險區域，並密切關注交通部中央氣象署最新警報。';
+    risk.push('謹防雷電，不要登山、溪邊戲水或在樹下避雨');
+    plan.push('水上與戶外高處項目大概率關閉');
+  }
+
+  // 高溫與紫外線
+  if (tMax >= 36) {
+    alert = alert ?? '高溫警示：氣溫炎熱，避免長時間戶外曝曬，注意補水與防暑。';
+    outfit.push('氣溫炎熱，選透氣輕薄衣物並避開正午外出');
+    items.push('充足飲用水、防暑用品');
+  } else if (tMax >= 32) {
+    outfit.push('氣溫較高，盡量避開正午外出');
+    plan.push('縮短戶外遊玩時間，多利用遮蔭與休息點');
+    items.push('防曬、充足飲用水');
+  }
+  if (uv >= 5) {
+    outfit.push('紫外線較強，注意防曬');
+    items.push('防曬霜、墨鏡、遮陽帽');
+  }
+
+  // 低溫
+  if (tMax - tMin > 8) {
+    outfit.push('晝夜溫差大，建議備一件外套方便增減衣物');
+  }
+  if (tMax <= 10) {
+    outfit.push('氣溫偏低，注意做好防寒');
+    items.push('厚外套、圍巾');
+  } else if (tMin <= 8) {
+    items.push('保暖衣物（清晨與夜間偏涼）');
+  }
+
+  // 風力
+  if (windB >= 8) {
+    alert = alert ?? '強風天氣：山區步道與溪邊風險升高，建議延後戶外行程，遠離崖邊、低窪與廣告牌。';
+    risk.push('強風，遠離廣告牌、崖邊與溪邊礁石');
+    plan.push('戶外高處項目大概率關閉');
+  } else if (windB >= 5) {
+    risk.push('風力偏大，山區步道與露天觀景留意防風');
+    plan.push('溪邊與高處活動留意強風');
+    items.push('帽子容易吹落，不建議穿寬鬆長裙');
+  }
+
+  // 晴天 / 陰天
+  if (isClear) {
+    outfit.push('天氣晴好，適合戶外遊覽');
+    plan.push('適合欣賞水幕與周邊山景，午後人潮較多可提早抵達');
+    items.push('記得防曬');
+  }
+  if (isOvercast) {
+    outfit.push('光線柔和，很適合拍照');
+    plan.push('無烈曬，適合長時間戶外逛遊');
+  }
+
+  // 霧
+  if (isFog) {
+    risk.push('能見度差，觀景與步道行走留意安全');
+    plan.push('不適合遠距離觀景');
+    items.push('口罩（如需）');
+  }
+
+  return { alert, risk, outfit, plan, items };
+}
+
+const rec = weather ? buildAdvice(weather) : null;
+const windB = weather ? kmhToBeaufort(weather.now.windSpeed) : 0;
+const uvToday = weather?.daily[0]?.uvIndex ?? 0;
 const precipToday = weather?.daily[0]?.precipProb ?? 0;
+const nowIcon = weather ? iconSvg(weatherCodeToIconKey(weather.now.weatherCode), 'size-14 sm:size-16') : '';
+
+// 區塊空白時給中性預設，避免出現空白卡片
+const outfitItems = rec && rec.outfit.length ? rec.outfit : ['天氣平穩，一般舒適穿著即可'];
+const planItems = rec && rec.plan.length ? rec.plan : ['適合安排戶外行程，按體力慢慢走'];
+const carryItems = rec && rec.items.length ? rec.items : ['今日無特別攜帶需求，輕裝即可'];
+
+// 出門一句話：依當前條件給一句最直白的總結
+function isClearLike(code: number): boolean {
+  return code === 0 || code === 1;
+}
+function oneLiner(): string {
+  if (!weather) return '今天山區多變，備傘更安心';
+  if (precipToday >= 60) return '今天記得帶傘';
+  if (windB >= 8) return '今天風大，留意安全';
+  if (weather.now.temperature >= 32 || uvToday >= 5) return '今天偏熱，注意防曬補水';
+  if (isClearLike(weather.now.weatherCode)) return '今天天氣不錯，適合出門';
+  return '今天山區多變，備傘更安心';
+}
+const outingOneLiner = oneLiner();
 ---
 
 <section id="weather" class="section relative overflow-hidden bg-[#0d2b26] text-white">
@@ -87,7 +227,7 @@ const precipToday = weather?.daily[0]?.precipProb ?? 0;
   <div class="container relative z-10">
     <p class="section-kicker !text-[#8ed1bf]">天氣預報</p>
     <h2 class="section-title">出發前看一眼：十分瀑布即時天氣與未來預報</h2>
-    <p class="max-w-3xl text-white/68">平溪山區天氣變化快，晴雨往往影響觀瀑品質與步道安全。以下天氣資料由 Open-Meteo 提供（非官方氣象單位），可作為行程參考；豪雨或颱風期間請以中央氣象署警特報與園區現場管制為準。</p>
+    <p class="max-w-3xl text-white/68">平溪山區天氣變化快，晴雨往往影響觀瀑品質與步道安全。下方除了即時溫度與未來多日預報，也會依當天天氣自動給出「怎麼穿、怎麼玩、帶什麼」的建議；豪雨或颱風期間請以交通部中央氣象署警特報與園區現場管制為準。</p>
 
     {
       weather ? (
@@ -106,11 +246,11 @@ const precipToday = weather?.daily[0]?.precipProb ?? 0;
                   </div>
                   <p class="mt-3 text-lg text-white/78">{weatherCodeToZh(weather.now.weatherCode)}</p>
                 </div>
-                <dl class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/72 sm:grid-cols-2">
+                <dl class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/72">
                   <div><dt class="text-white/48">體感溫度</dt><dd class="mt-0.5 font-bold text-white">{weather.now.apparentTemperature}°</dd></div>
                   <div><dt class="text-white/48">相對濕度</dt><dd class="mt-0.5 font-bold text-white">{weather.now.humidity}%</dd></div>
-                  <div><dt class="text-white/48">風速</dt><dd class="mt-0.5 font-bold text-white">{weather.now.windSpeed} km/h</dd></div>
-                  <div><dt class="text-white/48">降水（目前）</dt><dd class="mt-0.5 font-bold text-white">{weather.now.precipitation} mm</dd></div>
+                  <div><dt class="text-white/48">風力</dt><dd class="mt-0.5 font-bold text-white">{windB} 級 <span class="font-normal text-white/55">({weather.now.windSpeed} km/h)</span></dd></div>
+                  <div><dt class="text-white/48">紫外線</dt><dd class="mt-0.5 font-bold text-white">{uvToday} <span class="font-normal text-white/55">{uvToday >= 5 ? '偏強' : '一般'}</span></dd></div>
                 </dl>
               </div>
               <div class="mt-7 flex flex-wrap gap-2 border-t border-white/10 pt-5 text-sm">
@@ -120,17 +260,67 @@ const precipToday = weather?.daily[0]?.precipProb ?? 0;
               </div>
             </article>
 
-            <!-- 天氣與遊玩提示 -->
-            {advice && (
-              <article class="flex flex-col justify-between rounded-[2rem] border border-white/12 bg-white/7 p-7 sm:p-9">
-                <div>
-                  <p class="text-sm font-bold tracking-widest text-[#9dd8c8]">當下遊玩提示</p>
-                  <h3 class="mt-3 font-serif text-3xl font-bold text-[#c7f0e5]">{advice.title}</h3>
-                  <p class="mt-4 leading-8 text-white/72">{advice.body}</p>
-                </div>
-                <p class="mt-6 text-xs leading-6 text-white/48">山區午後易起霧轉雨；豪雨、颱風或雷擊風險期間，新北市政府可能實施入園管制，出發前請查新北旅客最新公告。</p>
-              </article>
-            )}
+            <!-- 出門一句話 -->
+            <article class="flex flex-col justify-between rounded-[2rem] border border-white/12 bg-white/7 p-7 sm:p-9">
+              <div>
+                <p class="text-sm font-bold tracking-widest text-[#9dd8c8]">出門一句話</p>
+                <h3 class="mt-3 font-serif text-3xl font-bold text-[#c7f0e5]">{outingOneLiner}</h3>
+                <p class="mt-4 leading-8 text-white/72">下面三個區塊會依當前與今日預報，自動列出「穿什麼、怎麼玩、帶什麼」，不需要自己看數據判斷。</p>
+              </div>
+              <p class="mt-6 text-xs leading-6 text-white/48">山區午後易起霧轉雨；豪雨、颱風或雷擊風險期間，新北市政府可能實施入園管制，出發前請查新北旅客最新公告。</p>
+            </article>
+          </div>
+
+          <!-- 紅色置頂：最劇烈天氣 -->
+          {
+            rec?.alert && (
+              <div class="mt-5 rounded-2xl border border-[#ff7a7a]/45 bg-[#ff7a7a]/12 p-5">
+                <p class="flex items-center gap-2 font-bold text-[#ffb3b3]"><span aria-hidden="true">⚠️</span> 氣象風險提醒</p>
+                <p class="mt-1.5 text-sm leading-7 text-white/85">{rec.alert}</p>
+              </div>
+            )
+          }
+
+          <!-- 黃色風險提醒 -->
+          {
+            rec && rec.risk.length > 0 && (
+              <div class="mt-4 rounded-2xl border border-[#ffd97a]/40 bg-[#ffd97a]/10 p-5">
+                <p class="flex items-center gap-2 font-bold text-[#ffe7a8]"><span aria-hidden="true">⚠️</span> 風險提醒</p>
+                <ul class="mt-2 space-y-1.5 text-sm leading-7 text-white/82">
+                  {rec.risk.map((r) => (
+                    <li class="flex gap-2"><span class="text-[#ffd97a]">·</span><span>{r}</span></li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          <!-- 三塊動態建議 -->
+          <div class="mt-4 grid gap-4 md:grid-cols-3">
+            <article class="rounded-2xl border border-white/12 bg-white/7 p-6">
+              <div class="flex items-center gap-2"><span class="text-lg" aria-hidden="true">👕</span><h3 class="font-bold text-[#c7f0e5]">出行穿搭</h3></div>
+              <ul class="mt-4 space-y-2">
+                {outfitItems.map((t) => (
+                  <li class="flex gap-2 text-sm text-white/78"><span class="text-[#9dd8c8]">✓</span><span>{t}</span></li>
+                ))}
+              </ul>
+            </article>
+            <article class="rounded-2xl border border-white/12 bg-white/7 p-6">
+              <div class="flex items-center gap-2"><span class="text-lg" aria-hidden="true">🗺️</span><h3 class="font-bold text-[#c7f0e5]">游玩安排</h3></div>
+              <ul class="mt-4 space-y-2">
+                {planItems.map((t) => (
+                  <li class="flex gap-2 text-sm text-white/78"><span class="text-[#9dd8c8]">✓</span><span>{t}</span></li>
+                ))}
+              </ul>
+            </article>
+            <article class="rounded-2xl border border-white/12 bg-white/7 p-6">
+              <div class="flex items-center gap-2"><span class="text-lg" aria-hidden="true">🎒</span><h3 class="font-bold text-[#c7f0e5]">随身物品</h3></div>
+              <ul class="mt-4 space-y-2">
+                {carryItems.map((t) => (
+                  <li class="flex gap-2 text-sm text-white/78"><span class="text-[#9dd8c8]">✓</span><span>{t}</span></li>
+                ))}
+              </ul>
+            </article>
           </div>
 
           <!-- 未來多日預報 -->
@@ -148,11 +338,11 @@ const precipToday = weather?.daily[0]?.precipProb ?? 0;
       ) : (
         <div class="mt-10 rounded-3xl border border-white/12 bg-white/7 p-8">
           <h3 class="font-serif text-2xl font-bold">天氣資料暫時無法取得</h3>
-          <p class="mt-3 max-w-3xl text-white/70">十分瀑布位處平溪山區，天氣多變。出發前建議查看中央氣象署天氣預報與新北旅客公告；雨後水量可能更充沛，但步道濕滑與溪水風險也會上升。</p>
+          <p class="mt-3 max-w-3xl text-white/70">十分瀑布位處平溪山區，天氣多變。出發前建議查看交通部中央氣象署天氣預報與新北旅客公告；雨後水量可能更充沛，但步道濕滑與溪水風險也會上升。</p>
         </div>
       )
     }
 
-    <p class="mt-6 text-xs leading-6 text-white/45">天氣資料來源：Open-Meteo（open-meteo.com）免費天氣 API，無需金鑰、無追蹤；座標對應十分瀑布（25.0482681, 121.7846723），時區 Asia/Taipei，預報未來 {FORECAST_DAYS} 日。快取時間 30 分鐘，實際請以中央氣象署為準。</p>
+    <p class="mt-6 text-xs leading-6 text-white/45">預報資料對應十分瀑布座標（25.0482681, 121.7846723），時區 Asia/Taipei，涵蓋未來 {FORECAST_DAYS} 日並定時更新；山區天氣變化快，實際出發請以交通部中央氣象署最新預報與新北旅客公告為準。以下建議由預報資料自動推導，不替代官方即時警特報。</p>
   </div>
 </section>

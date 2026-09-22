@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { SITE_NAME } from '../data/site';
 
 interface Props {
   title: string;
@@ -32,7 +33,7 @@ const isHome = Astro.url.pathname === '/';
     <meta name="ICBM" content="25.0482681, 121.7846723" />
     <title>{title}</title>
     {absoluteUrl && <link rel="canonical" href={absoluteUrl} />}
-    <meta name="application-name" content="十分瀑布旅遊指南" />
+    <meta name="application-name" content={SITE_NAME} />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png" />
@@ -42,7 +43,7 @@ const isHome = Astro.url.pathname === '/';
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_TW" />
-    <meta property="og:site_name" content="十分瀑布旅遊指南" />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {absoluteUrl && <meta property="og:url" content={absoluteUrl} />}
@@ -97,8 +98,8 @@ const isHome = Astro.url.pathname === '/';
 
     <header class="sticky top-0 z-50 border-b border-white/40 bg-[#f7fbf9]/90 backdrop-blur-xl">
       <div class="container flex min-h-18 items-center justify-between gap-6 py-3">
-        <a href="/" class="shrink-0" aria-label="十分瀑布旅遊指南首頁">
-          <img src="/icons/logo.svg" alt="十分瀑布旅遊指南" width="184" height="52" class="h-12 w-auto" />
+        <a href="/" class="shrink-0" aria-label={`${SITE_NAME}首頁`}>
+          <img src="/icons/logo.svg" alt={SITE_NAME} width="184" height="52" class="h-12 w-auto" />
         </a>
         <nav aria-label="主要導覽" class="hidden items-center gap-5 text-sm font-semibold text-[#355b51] lg:flex">
           <a href="/#about" class="hover:text-[#0d2b26]">瀑布特色</a>
@@ -106,6 +107,8 @@ const isHome = Astro.url.pathname === '/';
           <a href="/#visit" class="hover:text-[#0d2b26]">開放與費用</a>
           <a href="/#transport" class="hover:text-[#0d2b26]">交通停車</a>
           <a href="/#weather" class="hover:text-[#0d2b26]">天氣</a>
+          <a href="/#season" class="hover:text-[#0d2b26]">季節策略</a>
+          <a href="/#itinerary" class="hover:text-[#0d2b26]">行程推薦</a>
           <a href="/#facilities" class="hover:text-[#0d2b26]">實用設施</a>
           <a href="/#nearby" class="hover:text-[#0d2b26]">周邊探索</a>
           <a href="/#faq" class="hover:text-[#0d2b26]">常見問答</a>
@@ -123,7 +126,7 @@ const isHome = Astro.url.pathname === '/';
       <div class="container py-12">
         <div class="grid gap-10 lg:grid-cols-[1.15fr_.85fr]">
           <div>
-            <img src="/icons/logo.svg" alt="十分瀑布旅遊指南" width="184" height="52" class="mb-5 h-12 w-auto rounded-xl bg-white px-2" />
+            <img src="/icons/logo.svg" alt={SITE_NAME} width="184" height="52" class="mb-5 h-12 w-auto rounded-xl bg-white px-2" />
             <p class="max-w-2xl text-sm leading-7 text-white/72">本網站為一個獨立的非營利遊客資訊指南項目，與任何政府機構或官方組織均無隸屬關係。</p>
             <p class="mt-3 max-w-2xl text-sm leading-7 text-white/72">本站景點資訊均參考並對照考證自新北市政府、新北市政府觀光旅遊局與交通部觀光署公開資料，不包含任何商業性推薦。</p>
             <p class="mt-3 max-w-2xl text-sm leading-7 text-white/72">圖片產權：本網站所展示的所有圖片產權及版權均歸原攝影者所有；使用時依各圖片原始授權條款標示。</p>
@@ -156,7 +159,7 @@ const isHome = Astro.url.pathname === '/';
           </div>
         </div>
         <div class="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 十分瀑布旅遊指南。保留所有權利。</p>
+          <p>© 2026 {SITE_NAME}。保留所有權利。</p>
           <p>非官方旅遊資訊指南 · 重要行程資訊請於出發前向官方來源再次確認。</p>
         </div>
       </div>

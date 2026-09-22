@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-const title = '隱私政策｜十分瀑布旅遊指南';
+import { withSiteName } from '../data/site';
+const title = withSiteName('隱私政策');
 const description = '十分瀑布旅遊指南的隱私政策，說明瀏覽資料、Cookie、Google Analytics、Google Maps、資料用途與使用者權利。';
 ---
 <BaseLayout title={title} description={description} image="/images/shifen-waterfall-pool.jpg">
